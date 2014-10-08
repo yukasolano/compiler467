@@ -1,0 +1,219 @@
+Grammar
+
+    0 $accept: program $end
+
+    1 program: tokens
+
+    2 tokens: tokens token
+    3       | /* empty */
+
+    4 token: myToken1
+    5      | myToken2
+    6      | IF
+    7      | ELSE
+    8      | WHILE
+    9      | BREAK
+   10      | RETURN
+   11      | CONST
+   12      | VOID
+   13      | INT_V
+   14      | FLOAT_V
+   15      | TRUE_V
+   16      | FALSE_V
+   17      | ID
+   18      | TEXT
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+myToken1 (258) 4
+myToken2 (259) 5
+IF (260) 6
+ELSE (261) 7
+WHILE (262) 8
+BREAK (263) 9
+RETURN (264) 10
+CONST (265) 11
+VOID (266) 12
+INT_V (267) 13
+FLOAT_V (268) 14
+TRUE_V (269) 15
+FALSE_V (270) 16
+ID (271) 17
+TEXT (272) 18
+
+
+Nonterminals, with rules where they appear
+
+$accept (18)
+    on left: 0
+program (19)
+    on left: 1, on right: 0
+tokens (20)
+    on left: 2 3, on right: 1 2
+token (21)
+    on left: 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18, on right: 2
+
+
+state 0
+
+    0 $accept: . program $end
+
+    $default  reduce using rule 3 (tokens)
+
+    program  go to state 1
+    tokens   go to state 2
+
+
+state 1
+
+    0 $accept: program . $end
+
+    $end  shift, and go to state 3
+
+
+state 2
+
+    1 program: tokens .
+    2 tokens: tokens . token
+
+    myToken1  shift, and go to state 4
+    myToken2  shift, and go to state 5
+    IF        shift, and go to state 6
+    ELSE      shift, and go to state 7
+    WHILE     shift, and go to state 8
+    BREAK     shift, and go to state 9
+    RETURN    shift, and go to state 10
+    CONST     shift, and go to state 11
+    VOID      shift, and go to state 12
+    INT_V     shift, and go to state 13
+    FLOAT_V   shift, and go to state 14
+    TRUE_V    shift, and go to state 15
+    FALSE_V   shift, and go to state 16
+    ID        shift, and go to state 17
+    TEXT      shift, and go to state 18
+
+    $default  reduce using rule 1 (program)
+
+    token  go to state 19
+
+
+state 3
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+state 4
+
+    4 token: myToken1 .
+
+    $default  reduce using rule 4 (token)
+
+
+state 5
+
+    5 token: myToken2 .
+
+    $default  reduce using rule 5 (token)
+
+
+state 6
+
+    6 token: IF .
+
+    $default  reduce using rule 6 (token)
+
+
+state 7
+
+    7 token: ELSE .
+
+    $default  reduce using rule 7 (token)
+
+
+state 8
+
+    8 token: WHILE .
+
+    $default  reduce using rule 8 (token)
+
+
+state 9
+
+    9 token: BREAK .
+
+    $default  reduce using rule 9 (token)
+
+
+state 10
+
+   10 token: RETURN .
+
+    $default  reduce using rule 10 (token)
+
+
+state 11
+
+   11 token: CONST .
+
+    $default  reduce using rule 11 (token)
+
+
+state 12
+
+   12 token: VOID .
+
+    $default  reduce using rule 12 (token)
+
+
+state 13
+
+   13 token: INT_V .
+
+    $default  reduce using rule 13 (token)
+
+
+state 14
+
+   14 token: FLOAT_V .
+
+    $default  reduce using rule 14 (token)
+
+
+state 15
+
+   15 token: TRUE_V .
+
+    $default  reduce using rule 15 (token)
+
+
+state 16
+
+   16 token: FALSE_V .
+
+    $default  reduce using rule 16 (token)
+
+
+state 17
+
+   17 token: ID .
+
+    $default  reduce using rule 17 (token)
+
+
+state 18
+
+   18 token: TEXT .
+
+    $default  reduce using rule 18 (token)
+
+
+state 19
+
+    2 tokens: tokens token .
+
+    $default  reduce using rule 2 (tokens)
