@@ -207,7 +207,7 @@ LIMITATOR   [ \n\t\!\+\-\*\/\^\&\|\=\<\>\,\;\(\)\[\]\{\}]
                 return FALSE_V;
             }
         
-0|[1-9][0-9]*/[^a-zA-Z_0-9] {
+0|[1-9][0-9]*/[^a-zA-Z0-9] {
                 yylval.intValue = atoi(yytext);
                 yTRACE(INT_V);
                 return INT_V;

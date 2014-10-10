@@ -92,16 +92,16 @@ extern int yyline;        /* variable holding current line number   */
             SUB
             MULT
             DIV
-            EXP
-            COMP_NE 
+            EXP  
             AND
             OR
             ASSIGN
-            COMP_LT
-            COMP_GT
-            COMP_LE 
-            COMP_GE 
-            COMP_EQ
+            CMP_LT
+            CMP_GT
+            CMP_LE 
+            CMP_GE 
+            CMP_EQ
+            CMP_NE
             COMMA
             SEMICOLON
             LEFT_PAR
@@ -165,16 +165,16 @@ token
   |     SUB
   |     MULT
   |     DIV
-  |     EXP
-  |     COMP_NE 
+  |     EXP 
   |     AND
   |     OR
   |     ASSIGN
-  |     COMP_LT
-  |     COMP_GT
-  |     COMP_LE 
-  |     COMP_GE 
-  |     COMP_EQ
+  |     CMP_LT
+  |     CMP_GT
+  |     CMP_LE 
+  |     CMP_GE 
+  |     CMP_EQ
+  |     CMP_NE
   |     COMMA
   |     SEMICOLON
   |     LEFT_PAR

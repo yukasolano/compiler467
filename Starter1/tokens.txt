@@ -58,12 +58,12 @@ BVEC4_T		bvec4
 '='  ASSIGN
 '&&' AND
 '||' OR
-'<'  COMP_LT
-'>'  COMP_GT
-'<=' COMP_LE 
-'>=' COMP_GE 
-'==' COMP_EQ
-'!=' COMP_NE
+'<'  CMP_LT
+'>'  CMP_GT
+'<=' CMP_LE 
+'>=' CMP_GE 
+'==' CMP_EQ
+'!=' CMP_NE
 ','  COMMA
 ';'  SEMICOLON
 
