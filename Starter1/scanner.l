@@ -26,7 +26,9 @@ int yyline = 1;
 WS          [ \t]
 DIGIT       [0-9]
 LETTER      [a-zA-Z]
-LIMITATOR   [ \t\n]
+
+OPERATOR    [\!\+\-\*\/\^\&\|\=\<\>\,\;] 
+LIMITATOR   [ \n\t\!\+\-\*\/\^\&\|\=\<\>\,\;\(\)\[\]\{\}] 
 
 %%
 "/*"        {
@@ -79,18 +81,118 @@ LIMITATOR   [ \t\n]
                 return VOID;
             }
 
-
-
-0|[1-9][0-9]*/{LIMITATOR} {
-                yylval.intValue = atoi(yytext);
-                yTRACE(INT_V);
-                return INT_V;
+"!"         {
+                yTRACE(NOT);
+                return NOT;
             }
 
-(0|[1-9][0-9]*)"."[0-9]+/{LIMITATOR} {
-                yylval.floatValue = atof(yytext);
-                yTRACE(FLOAT_V);
-                return FLOAT_V;
+"+"         {
+                yTRACE(ADD);
+                return ADD;
+            }
+
+"-"         {
+                yTRACE(SUB);
+                return SUB;
+            }
+
+"*"         {
+                yTRACE(MULT);
+                return MULT;
+            }
+
+"/"         {
+                yTRACE(DIV);
+                return DIV;
+            }
+
+"^"         {
+                yTRACE(EXP);
+                return EXP;
+            }
+
+"="         {
+                yTRACE(ASSIGN);
+                return ASSIGN;
+            }
+"&&"        {
+                yTRACE(AND);
+                return AND;
+            }
+
+"||"        {
+                yTRACE(OR);
+                return OR;
+            }
+            
+"<"         {
+                yTRACE(CMP_LT);
+                return CMP_LT;
+            }
+
+">"         {
+                yTRACE(CMP_GT);
+                return CMP_GT;
+            }
+
+"<="        {
+                yTRACE(CMP_LE);
+                return CMP_LE;
+            }
+            
+">="        {
+                yTRACE(CMP_GE);
+                return CMP_GE;
+            } 
+
+"=="        {
+                yTRACE(CMP_EQ);
+                return CMP_EQ;
+            }
+
+"!="        {
+                yTRACE(CMP_NE);
+                return CMP_NE;
+            }
+
+","         {
+                yTRACE(COMMA);
+                return COMMA;
+            }
+            
+";"         {
+                yTRACE(SEMICOLON);
+                return SEMICOLON;
+            }  
+
+"("         {
+                yTRACE(LEFT_PAR);
+                return LEFT_PAR;
+            }
+
+")"         {
+                yTRACE(RIGHT_PAR);
+                return RIGHT_PAR;
+            }
+
+"{"         {
+                yTRACE(LEFT_BRACE);
+                return LEFT_BRACE;
+            }
+
+"}"         {
+                yTRACE(RIGHT_BRACE);
+                return RIGHT_BRACE;
+            }
+
+"["         {
+                yTRACE(LEFT_SQUARE);
+                return LEFT_SQUARE;
+            }
+
+"]"         {
+                yTRACE(RIGHT_SQUARE);
+                return RIGHT_SQUARE;
             }
 
 "true"      {
@@ -105,6 +207,19 @@ LIMITATOR   [ \t\n]
                 return FALSE_V;
             }
         
+0|[1-9][0-9]*/[^a-zA-Z_0-9] {
+                yylval.intValue = atoi(yytext);
+                yTRACE(INT_V);
+                return INT_V;
+            }
+
+(0|[1-9][0-9]*)"."[0-9]+/[^a-zA-Z0-9] {
+                yylval.floatValue = atof(yytext);
+                yTRACE(FLOAT_V);
+                return FLOAT_V;
+            }
+
+
 [a-zA-Z_][a-zA-Z_0-9]* {
                 if(strlen(yytext) > MAX_IDENTIFIER){
                     yERROR("Length larger than MAX_IDENTIFIER")
@@ -115,6 +230,8 @@ LIMITATOR   [ \t\n]
                 yTRACE(ID);
                 return ID;
             }
+
+
 
 
 .           { yERROR("Unknown token"); }

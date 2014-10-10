@@ -74,7 +74,42 @@ extern int yyline;        /* variable holding current line number   */
             TRUE_V      
             FALSE_V     
             ID                      
-            TEXT       
+            TEXT
+            INTEGER_T 
+            BOOLEAN_T
+            FLOAT_T   
+            VEC2_T    
+            VEC3_T    
+            VEC4_T    
+            IVEC2_T   
+            IVEC3_T  
+            IVEC4_T   
+            BVEC2_T   
+            BVEC3_T  
+            BVEC4_T   
+            NOT
+            ADD
+            SUB
+            MULT
+            DIV
+            EXP
+            COMP_NE 
+            AND
+            OR
+            ASSIGN
+            COMP_LT
+            COMP_GT
+            COMP_LE 
+            COMP_GE 
+            COMP_EQ
+            COMMA
+            SEMICOLON
+            LEFT_PAR
+            RIGHT_PAR
+            LEFT_SQUARE
+            RIGHT_SQUARE
+            LEFT_BRACE
+            RIGHT_BRACE     
 
 %start    program
 
@@ -112,7 +147,42 @@ token
   |     TRUE_V      
   |     FALSE_V     
   |     ID                      
-  |     TEXT 
+  |     TEXT
+  |     INTEGER_T 
+  |     BOOLEAN_T
+  |     FLOAT_T   
+  |     VEC2_T    
+  |     VEC3_T    
+  |     VEC4_T    
+  |     IVEC2_T   
+  |     IVEC3_T  
+  |     IVEC4_T   
+  |     BVEC2_T   
+  |     BVEC3_T  
+  |     BVEC4_T   
+  |     NOT
+  |     ADD
+  |     SUB
+  |     MULT
+  |     DIV
+  |     EXP
+  |     COMP_NE 
+  |     AND
+  |     OR
+  |     ASSIGN
+  |     COMP_LT
+  |     COMP_GT
+  |     COMP_LE 
+  |     COMP_GE 
+  |     COMP_EQ
+  |     COMMA
+  |     SEMICOLON
+  |     LEFT_PAR
+  |     RIGHT_PAR
+  |     LEFT_SQUARE
+  |     RIGHT_SQUARE
+  |     LEFT_BRACE
+  |     RIGHT_BRACE     
 
   ;
 

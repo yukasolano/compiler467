@@ -49,33 +49,34 @@ BVEC4_T		bvec4
 
 
 ***operators*** (not sure if we need to define each one as a token)
-'!' 
-'&'  not sure if we need this
-'*' 
-'+' 
-',' 
-'-' 
-'/' 
-';' 
-'<' 
-'=' 
-'>'  
-'^'  
-'|'  not sure if we need this
-NEQ !=
-LEQ <=
-GEQ >=
-AND &&
-OR 	||
-EQ 	==
+'!'  NOT
+'+'  ADD
+'-'  SUB
+'*'  MULT
+'/'  DIV
+'^'  EXP
+'='  ASSIGN
+'&&' AND
+'||' OR
+'<'  COMP_LT
+'>'  COMP_GT
+'<=' COMP_LE 
+'>=' COMP_GE 
+'==' COMP_EQ
+'!=' COMP_NE
+','  COMMA
+';'  SEMICOLON
+
+
+
 
 ***brackets***
-'(' 
-')'
-'[' 
-']'
-'{'
-'}'
+'(' LEFT_PAR
+')' RIGHT_PAR
+'[' LEFT_SQUARE
+']' RIGHT_SQUARE
+'{' LEFT_BRACE
+'}' RIGHT_BRACE
 
 
 
