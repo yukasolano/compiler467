@@ -27,8 +27,6 @@ WS          [ \t]
 DIGIT       [0-9]
 LETTER      [a-zA-Z]
 
-OPERATOR    [\!\+\-\*\/\^\&\|\=\<\>\,\;] 
-LIMITATOR   [ \n\t\!\+\-\*\/\^\&\|\=\<\>\,\;\(\)\[\]\{\}] 
 
 %%
 "/*"        {
@@ -206,6 +204,71 @@ LIMITATOR   [ \n\t\!\+\-\*\/\^\&\|\=\<\>\,\;\(\)\[\]\{\}]
                 yTRACE(FALSE_V);
                 return FALSE_V;
             }
+
+"lit"       {
+                yTRACE(LIT);
+                return LIT;
+            }
+"dp3"       {
+                yTRACE(DP3);
+                return DP3;
+            }
+"rsq"       {
+                yTRACE(RSQ);
+                return RSQ;
+            }
+"gl_FragColor"  {
+                yTRACE(gl_FragColor);
+                return gl_FragColor;
+            } 
+"gl_FragDepth"  {
+                yTRACE(gl_FragDepth);
+                return gl_FragDepth;
+            }         
+"gl_FragCoord"  {
+                yTRACE(gl_FragCoord);
+                return gl_FragCoord;
+            }
+"gl_TexCoord"   {
+                yTRACE(gl_TexCoord);
+                return gl_TexCoord;
+            }
+"gl_Color"      {
+                yTRACE(gl_Color);
+                return gl_Color;
+            }
+"gl_Secondary"  {
+                yTRACE(gl_Secondary);
+                return gl_Secondary;
+            } 
+"gl_FogFragCoord"   {
+                yTRACE(gl_FogFragCoord);
+                return gl_FogFragCoord;
+            } 
+"gl_Light_Half" {
+                yTRACE(gl_Light_Half);
+                return gl_Light_Half;
+            }
+"gl_Light_Ambient"  {
+                yTRACE(gl_Light_Ambient);
+                return gl_Light_Ambient;
+            }
+"gl_Material_Shininess" {
+                yTRACE(gl_Material_Shininess);
+                return gl_Material_Shininess;
+            }
+"env1"      {
+                yTRACE(env1);
+                return env1;
+            }
+"env2"      {
+                yTRACE(env2);
+                return env2;
+            }
+"env3"      {
+                yTRACE(env3);
+                return env3;
+            }          
         
 0|[1-9][0-9]*/[^a-zA-Z0-9] {
                 yylval.intValue = atoi(yytext);

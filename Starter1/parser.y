@@ -109,7 +109,23 @@ extern int yyline;        /* variable holding current line number   */
             LEFT_SQUARE
             RIGHT_SQUARE
             LEFT_BRACE
-            RIGHT_BRACE     
+            RIGHT_BRACE
+            LIT
+            DP3
+            RSQ 
+            gl_FragColor 
+            gl_FragDepth          
+            gl_FragCoord
+            gl_TexCoord 
+            gl_Color 
+            gl_Secondary 
+            gl_FogFragCoord 
+            gl_Light_Half
+            gl_Light_Ambient
+            gl_Material_Shininess
+            env1
+            env2
+            env3  
 
 %start    program
 
@@ -182,8 +198,23 @@ token
   |     LEFT_SQUARE
   |     RIGHT_SQUARE
   |     LEFT_BRACE
-  |     RIGHT_BRACE     
-
+  |     RIGHT_BRACE  
+  |     LIT
+  |     DP3
+  |     RSQ 
+  |     gl_FragColor 
+  |     gl_FragDepth          
+  |     gl_FragCoord
+  |     gl_TexCoord 
+  |     gl_Color 
+  |     gl_Secondary 
+  |     gl_FogFragCoord 
+  |     gl_Light_Half
+  |     gl_Light_Ambient
+  |     gl_Material_Shininess
+  |     env1
+  |     env2
+  |     env3   
   ;
 
 
