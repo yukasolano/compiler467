@@ -24,7 +24,7 @@
  
 #define MAX_IDENTIFIER 32
 #define MAX_TEXT       256
-#define MAX_INTEGER    32767
+#define MAX_INTEGER    2097152
 
 /********************************************************************** 
  * External declarations for variables declared in globalvars.c.

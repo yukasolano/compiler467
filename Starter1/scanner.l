@@ -193,18 +193,6 @@ LETTER      [a-zA-Z]
                 return RIGHT_SQUARE;
             }
 
-"true"      {
-                yylval.boolValue = true;
-                yTRACE(TRUE_V);
-                return TRUE_V;
-            }
-
-"false"     {
-                yylval.boolValue = false;
-                yTRACE(FALSE_V);
-                return FALSE_V;
-            }
-
 "lit"       {
                 yTRACE(LIT);
                 return LIT;
@@ -269,15 +257,24 @@ LETTER      [a-zA-Z]
                 yTRACE(env3);
                 return env3;
             }          
-        
+
+"true"|"false" {
+                yylval.boolValue = (strncmp(yytext, "true", 4) == 0)? true : false;
+                printf("boolvalue: %d", yylval.boolValue);
+                yTRACE(BOOLEAN_V);
+                return BOOLEAN_V;
+            }
+
 0|[1-9][0-9]*/[^a-zA-Z0-9] {
                 yylval.intValue = atoi(yytext);
-                yTRACE(INT_V);
-                return INT_V;
+                if( yylval.intValue < 0 || yylval.intValue > MAX_INTEGER ) yERROR("Out of bounds integer.\n");
+                yTRACE(INTEGER_V);
+                return INTEGER_V;
             }
 
 (0|[1-9][0-9]*)"."[0-9]+/[^a-zA-Z0-9] {
                 yylval.floatValue = atof(yytext);
+                if( yylval.floatValue == -1 ) yERROR("Out of bounds float.\n");
                 yTRACE(FLOAT_V);
                 return FLOAT_V;
             }
@@ -285,7 +282,7 @@ LETTER      [a-zA-Z]
 
 [a-zA-Z_][a-zA-Z_0-9]* {
                 if(strlen(yytext) > MAX_IDENTIFIER){
-                    yERROR("Length larger than MAX_IDENTIFIER")
+                    yERROR("Identifier is too long.\n")
                 }
                 yylval.stringValue = (char *)malloc(strlen(yytext));
                 strncpy(yylval.stringValue, yytext, strlen(yytext));

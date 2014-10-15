@@ -69,10 +69,9 @@ extern int yyline;        /* variable holding current line number   */
             RETURN  
             CONST   
             VOID
-            INT_V       
+            INTEGER_V       
             FLOAT_V     
-            TRUE_V      
-            FALSE_V     
+            BOOLEAN_V           
             ID                      
             TEXT
             INTEGER_T 
@@ -158,10 +157,9 @@ token
   |     RETURN  
   |     CONST   
   |     VOID
-  |     INT_V       
+  |     INTEGER_V       
   |     FLOAT_V     
-  |     TRUE_V      
-  |     FALSE_V     
+  |     BOOLEAN_V          
   |     ID                      
   |     TEXT
   |     INTEGER_T 
