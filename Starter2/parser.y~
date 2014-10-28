@@ -82,8 +82,12 @@ enum {
 %token <as_int>   INT_C
 %token <as_str>   ID
 
+/*
 %left     OR
 %left	    AND
+*/
+%left     '|'
+%left	    '&'
 %nonassoc '=' NEQ '<' LEQ '>' GEQ
 %left     '+' '-'
 %left     '*' '/'
