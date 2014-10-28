@@ -260,7 +260,6 @@ LETTER      [a-zA-Z]
 
 "true"|"false" {
                 yylval.boolValue = (strncmp(yytext, "true", 4) == 0)? true : false;
-                printf("boolvalue: %d", yylval.boolValue);
                 yTRACE(BOOLEAN_V);
                 return BOOLEAN_V;
             }
