@@ -92,6 +92,8 @@ enum {
 
 %start    program
 
+
+
 %%
 
 /***********************************************************************
@@ -105,11 +107,11 @@ program
   :   scope       															{ yTRACE("program -> scope");}
   ;
 scope
-  : '{' declarations statements '}' 									{ yTRACE("scope -> declarations statements");}
+  : '{' declarations statements '}'                 				{ yTRACE("scope -> { declarations statements }");}
   ;
 declarations
   : declarations declaration												{ yTRACE("declarations -> declarations declaration");}
-  |																				{ yTRACE("declarations -> Epsilon");}
+  |											       							{ yTRACE("declarations -> Epsilon");}
   ;
 statements
   : statements statement													{ yTRACE("statements -> statements statement");}

@@ -83,14 +83,21 @@ enum {
 %token <as_str>   ID
 
 %left     OR
+<<<<<<< HEAD
 %left	    AND
 %nonassoc '=' NEQ '<' LEQ '>' GEQ EQ
+=======
+%left	  AND
+%nonassoc '=' NEQ '<' LEQ '>' GEQ
+>>>>>>> f9d5acce8a0dce98213cb05c09fbbadbcb7a9d19
 %left     '+' '-'
 %left     '*' '/'
 %right    '^'
 %nonassoc '!' UMINUS
 
 %start    program
+
+
 
 %%
 
@@ -105,11 +112,11 @@ program
   :   scope       															{ yTRACE("program -> scope");}
   ;
 scope
-  : '{' declarations statements '}' 									{ yTRACE("scope -> declarations statements");}
+  : '{' declarations statements '}'                 				{ yTRACE("scope -> { declarations statements }");}
   ;
 declarations
   : declarations declaration												{ yTRACE("declarations -> declarations declaration");}
-  |																				{ yTRACE("declarations -> Epsilon");}
+  |											       							{ yTRACE("declarations -> Epsilon");}
   ;
 statements
   : statements statement													{ yTRACE("statements -> statements statement");}
@@ -146,8 +153,7 @@ expression
   | INT_C																		{ yTRACE("expression -> INT_C");}
   | FLOAT_C																		{ yTRACE("expression -> FLOAT_C");}
   | variable																	{ yTRACE("expression -> variable");}
-  | unary_minus expression						%prec UMINUS			{ yTRACE("expression -> unary_minus expression");}
-  | logical_not expression						%prec '!'				{ yTRACE("expression -> logical_not expression");}
+  | unary_op expression							%prec UMINUS			{ yTRACE("expression -> unary_op expression");}
   | expression add_op expression				%prec '+'				{ yTRACE("expression -> expression add_op expression");}
   | expression mult_op expression			%prec '*'				{ yTRACE("expression -> expression mult_op expression");}
   | expression exp_op expression				%prec '^'				{ yTRACE("expression -> expression exp_op expression");}
@@ -162,11 +168,9 @@ variable
   : ID																			{ yTRACE("variable -> ID");}
   | ID '[' INT_C ']'															{ yTRACE("variable -> ID[INT_C]");}
   ;
-logical_not
+unary_op
   : '!'		%prec '!'														{ yTRACE("unary_op -> !");}
-  ;
-unary_minus
-  : '-'		%prec UMINUS													{ yTRACE("unary_op -> -");}
+  | '-'		%prec UMINUS													{ yTRACE("unary_op -> -");}
   ;
 and_op
   : AND		%prec AND														{ yTRACE("and_op -> AND");}
