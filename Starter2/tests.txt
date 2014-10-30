@@ -1,0 +1,310 @@
+###########################################
+#										  #
+#				TEST CASES				  #
+#										  #
+###########################################
+
+
+The  main function is enclosed inside a scope
+
+	{ int num =5; num =10;}
+	declarations -> Epsilon
+	type -> INT_T
+	expression -> INT_C
+	declaration -> type ID = expression ;
+	declarations -> declarations declaration
+	statements -> Epsilon
+	variable -> ID
+	expression -> INT_C
+	statement -> variable = expression
+	statements -> statements statement
+	scope -> '{' declarations statements '}'
+	program -> scope
+
+
+Otherwise it gets an error 
+
+	int num =5; num =10;
+
+	PARSER ERROR, LINE 1: syntax error, unexpected INT_T, expecting '{'
+
+
+###########################################
+
+
+Declaration is similar to C
+
+	{int num; vec3 myvec;}
+	declarations -> Epsilon
+	type -> INT_T
+	declaration -> type ID ;
+	declarations -> declarations declaration
+	type -> VEC_T
+	declaration -> type ID ;
+	declarations -> declarations declaration
+	statements -> Epsilon
+	scope -> '{' declarations statements '}'
+	program -> scope
+
+But it is not allowed to declare 2 variables in 1 declaration
+
+	{int num1,num2;}
+	declarations -> Epsilon
+	type -> INT_T
+
+	PARSER ERROR, LINE 1: syntax error, unexpected ',', expecting '=' or ';'
+
+###########################################
+
+Operators do not associate
+
+	{int a = b = 3;}
+	declarations -> Epsilon
+	type -> INT_T
+	variable -> ID
+	expression -> variable
+
+	PARSER ERROR, LINE 1: syntax error, unexpected '='
+
+
+###########################################
+
+Vectors are initialized using constructors
+
+	{bvec3 myBVec = bvec3(true,false,true);}
+	declarations -> Epsilon
+	type -> BVEC_T
+	type -> BVEC_T
+	expression -> TRUE_C
+	arguments -> expression
+	expression -> FALSE_C
+	arguments -> arguments, expression
+	expression -> TRUE_C
+	arguments -> arguments, expression
+	constructor -> type (arguments)
+	expression -> constructor
+	declaration -> type ID = expression ;
+	declarations -> declarations declaration
+	statements -> Epsilon
+	scope -> '{' declarations statements '}'
+	program -> scope
+
+###########################################
+
+Vectors can be accessed similarly to arrays
+
+	{int num = myVec[2];}
+	declarations -> Epsilon
+	type -> INT_T
+	variable -> ID[INT_C]
+	expression -> variable
+	declaration -> type ID = expression ;
+	declarations -> declarations declaration
+	statements -> Epsilon
+	scope -> '{' declarations statements '}'
+	program -> scope
+
+###########################################
+	
+Type casting is not allowed
+
+	{int num = (int) 5.0;}
+	declarations -> Epsilon
+	type -> INT_T
+	type -> INT_T
+
+	PARSER ERROR, LINE 1: syntax error, unexpected ')', expecting '('
+
+
+###########################################
+
+The declaration of a compile time constant is like C.
+
+	{const int num = 1;}
+	declarations -> Epsilon
+	type -> INT_T
+	expression -> INT_C
+	CONST declaration -> type ID = expression ;
+	declarations -> declarations declaration
+	statements -> Epsilon
+	scope -> '{' declarations statements '}'
+	program -> scope
+
+
+###########################################
+
+WHILE statemets
+
+	{while(true){a=a+1;}}
+	declarations -> Epsilon
+	statements -> Epsilon
+	expression -> TRUE_C
+	declarations -> Epsilon
+	statements -> Epsilon
+	variable -> ID
+	variable -> ID
+	expression -> variable
+	binary_op -> +
+	expression -> INT_C
+	expression -> expression binary_op expression
+	statement -> variable = expression
+	statements -> statements statement
+	scope -> '{' declarations statements '}'
+	statement -> scope
+	statement -> while(expression) statement
+	statements -> statements statement
+	scope -> '{' declarations statements '}'
+	program -> scope
+
+
+###########################################
+
+IF statements
+
+	{if(a==true) b = 1.4;}
+	declarations -> Epsilon
+	statements -> Epsilon
+	variable -> ID
+	expression -> variable
+	binary_op -> EQ
+	expression -> TRUE_C
+	expression -> expression binary_op expression
+	variable -> ID
+	expression -> FLOAT_C
+	statement -> variable = expression
+	else_statement -> Epsilon
+	statement -> if(expression) statement else_statement
+	statements -> statements statement
+	scope -> '{' declarations statements '}'
+	program -> scope
+
+###########################################
+
+IF_ELSE statements
+
+	{if(a==true) b = 1.4; else b = 2.8;}
+	declarations -> Epsilon
+	statements -> Epsilon
+	variable -> ID
+	expression -> variable
+	binary_op -> EQ
+	expression -> TRUE_C
+	expression -> expression binary_op expression
+	variable -> ID
+	expression -> FLOAT_C
+	statement -> variable = expression
+	variable -> ID
+	expression -> FLOAT_C
+	statement -> variable = expression
+	else_statement -> ELSE statement
+	statement -> if(expression) statement else_statement
+	statements -> statements statement
+	scope -> '{' declarations statements '}'
+	program -> scope
+
+
+	{if(a==true) b = 1.4; else if (c == true) b = 2.8; else b = 4.2;}
+	declarations -> Epsilon
+	statements -> Epsilon
+	variable -> ID
+	expression -> variable
+	binary_op -> EQ
+	expression -> TRUE_C
+	expression -> expression binary_op expression
+	variable -> ID
+	expression -> FLOAT_C
+	statement -> variable = expression
+	variable -> ID
+	expression -> variable
+	binary_op -> EQ
+	expression -> TRUE_C
+	expression -> expression binary_op expression
+	variable -> ID
+	expression -> FLOAT_C
+	statement -> variable = expression
+	variable -> ID
+	expression -> FLOAT_C
+	statement -> variable = expression
+	else_statement -> ELSE statement
+	statement -> if(expression) statement else_statement
+	else_statement -> ELSE statement
+	statement -> if(expression) statement else_statement
+	statements -> statements statement
+	scope -> { declarations statements }
+	program -> scope
+
+
+###########################################
+
+FUNCTIONS
+
+	{ a = dp3(vector1,vector2);}
+	declarations -> Epsilon
+	statements -> Epsilon
+	variable -> ID
+	function_name -> FUNC
+	variable -> ID
+	expression -> variable
+	arguments -> expression
+	variable -> ID
+	expression -> variable
+	arguments -> arguments, expression
+	arguments_opt -> arguments
+	function -> (arguments_opt)
+	expression -> function
+	statement -> variable = expression
+	statements -> statements statement
+	scope -> { declarations statements }
+	program -> scope
+
+
+###########################################
+
+Precedences
+
+This statement should be a = (5 + (4 * 3))
+and there is no way to know whether it is right!
+
+	{ a = 5 + 4 * 3;}   
+	declarations -> Epsilon
+	statements -> Epsilon
+	variable -> ID
+	expression -> INT_C
+	binary_op -> +
+	expression -> INT_C
+	binary_op -> *
+	expression -> INT_C
+	expression -> expression binary_op expression    	<<
+	expression -> expression binary_op expression		<<
+	statement -> variable = expression
+	statements -> statements statement
+	scope -> '{' declarations statements '}'
+	program -> scope
+
+
+This statement should be a = ((5 ^ (-2)) + 3), 
+but it seems to be a = (5  ^ -( 2 + 3)) which is wrong!
+
+	{a= 5 ^ -2 + 3;}
+	declarations -> Epsilon
+	statements -> Epsilon
+	variable -> ID
+	expression -> INT_C
+	binary_op -> ^
+	unary_op -> -
+	expression -> INT_C
+	binary_op -> +
+	expression -> INT_C
+	expression -> expression binary_op expression	<<
+	expression -> unary_op expression				<<
+	expression -> expression binary_op expression	<<
+	statement -> variable = expression
+	statements -> statements statement
+	scope -> { declarations statements }
+	program -> scope
+
+
+
+
+
+

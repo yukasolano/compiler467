@@ -83,7 +83,7 @@ enum {
 %token <as_str>   ID
 
 %left     OR
-%left	    AND
+%left	  AND
 %nonassoc '=' NEQ '<' LEQ '>' GEQ
 %left     '+' '-'
 %left     '*' '/'
@@ -91,6 +91,8 @@ enum {
 %nonassoc '!' UMINUS
 
 %start    program
+
+
 
 %%
 
@@ -102,95 +104,95 @@ enum {
  *    2. Implement the trace parser option of the compiler
  ***********************************************************************/
 program
-  :   scope       															{ yTRACE("program -> scope");}
+  :   scope       									{ yTRACE("program -> scope");}
   ;
 scope
-  : '{' declarations statements '}' 									{ yTRACE("scope -> declarations statements");}
+  : '{' declarations statements '}'                 { yTRACE("scope -> { declarations statements }");}
   ;
 declarations
-  : declarations declaration												{ yTRACE("declarations -> declarations declaration");}
-  |																				{ yTRACE("declarations -> Epsilon");}
+  : declarations declaration						{ yTRACE("declarations -> declarations declaration");}
+  |											        { yTRACE("declarations -> Epsilon");}
   ;
 statements
-  : statements statement													{ yTRACE("statements -> statements statement");}
-  |																				{ yTRACE("statements -> Epsilon");}
+  : statements statement							{ yTRACE("statements -> statements statement");}
+  |													{ yTRACE("statements -> Epsilon");}
   ;
 declaration
-  : type ID ';'																{ yTRACE("declaration -> type ID ;");}
-  | type ID '=' expression ';'											{ yTRACE("declaration -> type ID = expression ;");}
-  | CONST type ID '=' expression ';'									{ yTRACE("CONST declaration -> type ID = expression ;");}
-  |																				{ yTRACE("declaration -> Epsilon");}
+  : type ID ';'										{ yTRACE("declaration -> type ID ;");}
+  | type ID '=' expression ';'						{ yTRACE("declaration -> type ID = expression ;");}
+  | CONST type ID '=' expression ';'				{ yTRACE("declaration -> CONST type ID = expression ;");}
+  |													{ yTRACE("declaration -> Epsilon");}
   ;
 statement
-  : variable '=' expression ';'											{ yTRACE("statement -> variable = expression");}
-  | IF '(' expression ')' statement else_statement					{ yTRACE("statement -> if(expression) statement else_statement");}
-  | WHILE '(' expression ')' statement									{ yTRACE("statement -> while(expression) statement");}
-  | scope																		{ yTRACE("statement -> scope");}
-  | ';'																			{ yTRACE("statement -> ;");}
+  : variable '=' expression ';'						{ yTRACE("statement -> variable = expression");}
+  | IF '(' expression ')' statement else_statement	{ yTRACE("statement -> if(expression) statement else_statement");}
+  | WHILE '(' expression ')' statement				{ yTRACE("statement -> while(expression) statement");}
+  | scope											{ yTRACE("statement -> scope");}
+  | ';'												{ yTRACE("statement -> ;");}
   ;
 else_statement
-  : ELSE statement															{ yTRACE("else_statement -> ELSE statement");}
-  |																				{ yTRACE("else_statement -> Epsilon");}
+  : ELSE statement									{ yTRACE("else_statement -> ELSE statement");}
+  |													{ yTRACE("else_statement -> Epsilon");}
   ;
 type
-  : INT_T																		{ yTRACE("type -> INT_T");}
-  | IVEC_T																		{ yTRACE("type -> IVEC_T");}
-  | BOOL_T																		{ yTRACE("type -> BOOL_T");}
-  | BVEC_T																		{ yTRACE("type -> BVEC_T");}
-  | FLOAT_T																		{ yTRACE("type -> FLOAT_T");}
-  | VEC_T																		{ yTRACE("type -> VEC_T");}
+  : INT_T											{ yTRACE("type -> INT_T");}
+  | IVEC_T											{ yTRACE("type -> IVEC_T");}
+  | BOOL_T											{ yTRACE("type -> BOOL_T");}
+  | BVEC_T											{ yTRACE("type -> BVEC_T");}
+  | FLOAT_T											{ yTRACE("type -> FLOAT_T");}
+  | VEC_T											{ yTRACE("type -> VEC_T");}
   ;
 expression
-  : constructor																{ yTRACE("expression -> constructor");}
-  | function																	{ yTRACE("expression -> function");}
-  | INT_C																		{ yTRACE("expression -> INT_C");}
-  | FLOAT_C																		{ yTRACE("expression -> FLOAT_C");}
-  | variable																	{ yTRACE("expression -> variable");}
-  | unary_op expression														{ yTRACE("expression -> unary_op expression");}
-  | expression binary_op expression										{ yTRACE("expression -> expression binary_op expression");}
-  | TRUE_C																		{ yTRACE("expression -> TRUE_C");}
-  | FALSE_C																		{ yTRACE("expression -> FALSE_C");}
-  | '(' expression ')'														{ yTRACE("expression -> (expression)");}
+  : constructor										{ yTRACE("expression -> constructor");}
+  | function										{ yTRACE("expression -> function");}
+  | INT_C											{ yTRACE("expression -> INT_C");}
+  | FLOAT_C											{ yTRACE("expression -> FLOAT_C");}
+  | variable										{ yTRACE("expression -> variable");}
+  | unary_op expression								{ yTRACE("expression -> unary_op expression");}
+  | expression binary_op expression					{ yTRACE("expression -> expression binary_op expression");}
+  | TRUE_C											{ yTRACE("expression -> TRUE_C");}
+  | FALSE_C											{ yTRACE("expression -> FALSE_C");}
+  | '(' expression ')'								{ yTRACE("expression -> (expression)");}
   ;
 variable
-  : ID																			{ yTRACE("variable -> ID");}
-  | ID '[' INT_C ']'															{ yTRACE("variable -> ID[INT_C]");}
+  : ID												{ yTRACE("variable -> ID");}
+  | ID '[' INT_C ']'								{ yTRACE("variable -> ID[INT_C]");}
   ;
 unary_op
-  : '!'																			{ yTRACE("unary_op -> !");}
-  | '-'																			{ yTRACE("unary_op -> -");}
+  : '!'												{ yTRACE("unary_op -> !");}
+  | '-'												{ yTRACE("unary_op -> -");}
   ;
 binary_op
-  : AND																			{ yTRACE("binary_op -> AND");}
-  | OR																			{ yTRACE("binary_op -> OR");}
-  | EQ																			{ yTRACE("binary_op -> EQ");}
-  | NEQ																			{ yTRACE("binary_op -> NEQ");}
-  | LEQ																			{ yTRACE("binary_op -> LEQ");}
-  | GEQ																			{ yTRACE("binary_op -> GEQ");}
-  | '<'																			{ yTRACE("binary_op -> <");}
-  | '>'																			{ yTRACE("binary_op -> >");}
-  | '+'																			{ yTRACE("binary_op -> +");}
-  | '-'																			{ yTRACE("binary_op -> -");}
-  | '*'																			{ yTRACE("binary_op -> *");}
-  | '/'																			{ yTRACE("binary_op -> /");}
-  | '^'																			{ yTRACE("binary_op -> ^");}
+  : AND												{ yTRACE("binary_op -> AND");}
+  | OR												{ yTRACE("binary_op -> OR");}
+  | EQ												{ yTRACE("binary_op -> EQ");}
+  | NEQ												{ yTRACE("binary_op -> NEQ");}
+  | LEQ												{ yTRACE("binary_op -> LEQ");}
+  | GEQ												{ yTRACE("binary_op -> GEQ");}
+  | '<'												{ yTRACE("binary_op -> <");}
+  | '>'												{ yTRACE("binary_op -> >");}
+  | '+'												{ yTRACE("binary_op -> +");}
+  | '-'												{ yTRACE("binary_op -> -");}
+  | '*'												{ yTRACE("binary_op -> *");}
+  | '/'												{ yTRACE("binary_op -> /");}
+  | '^'												{ yTRACE("binary_op -> ^");}
   ;
 constructor
-  : type '(' arguments ')'													{ yTRACE("constructor -> type (arguments)");}
+  : type '(' arguments ')'							{ yTRACE("constructor -> type (arguments)");}
   ;
 function
-  : function_name '(' arguments_opt ')'								{ yTRACE("function -> (arguments_opt)");}
+  : function_name '(' arguments_opt ')'				{ yTRACE("function -> (arguments_opt)");}
   ;
 function_name
-  : FUNC																			{ yTRACE("function_name -> FUNC");}
+  : FUNC											{ yTRACE("function_name -> FUNC");}
   ;
 arguments_opt
-  : arguments																	{ yTRACE("arguments_opt -> arguments");}
-  |																				{ yTRACE("arguments_opt -> Epsilon");}
+  : arguments										{ yTRACE("arguments_opt -> arguments");}
+  |													{ yTRACE("arguments_opt -> Epsilon");}
   ;
 arguments
-  : arguments ',' expression												{ yTRACE("arguments -> arguments, expression");}
-  | expression																	{ yTRACE("arguments -> expression");}
+  : arguments ',' expression						{ yTRACE("arguments -> arguments, expression");}
+  | expression										{ yTRACE("arguments -> expression");}
   ;                   
 
 
