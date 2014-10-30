@@ -84,7 +84,7 @@ enum {
 
 %left     OR
 %left	    AND
-%nonassoc '=' NEQ '<' LEQ '>' GEQ
+%nonassoc '=' NEQ '<' LEQ '>' GEQ EQ
 %left     '+' '-'
 %left     '*' '/'
 %right    '^'
@@ -119,7 +119,7 @@ declaration
   : type ID ';'																{ yTRACE("declaration -> type ID ;");}
   | type ID '=' expression ';'											{ yTRACE("declaration -> type ID = expression ;");}
   | CONST type ID '=' expression ';'									{ yTRACE("CONST declaration -> type ID = expression ;");}
-  |																				{ yTRACE("declaration -> Epsilon");}
+/*  |																				{ yTRACE("declaration -> Epsilon");}*/
   ;
 statement
   : variable '=' expression ';'											{ yTRACE("statement -> variable = expression");}
@@ -146,8 +146,13 @@ expression
   | INT_C																		{ yTRACE("expression -> INT_C");}
   | FLOAT_C																		{ yTRACE("expression -> FLOAT_C");}
   | variable																	{ yTRACE("expression -> variable");}
-  | unary_op expression														{ yTRACE("expression -> unary_op expression");}
-  | expression binary_op expression										{ yTRACE("expression -> expression binary_op expression");}
+  | unary_op expression							%prec UMINUS			{ yTRACE("expression -> unary_op expression");}
+  | expression add_op expression				%prec '+'				{ yTRACE("expression -> expression add_op expression");}
+  | expression mult_op expression			%prec '*'				{ yTRACE("expression -> expression mult_op expression");}
+  | expression exp_op expression				%prec '^'				{ yTRACE("expression -> expression exp_op expression");}
+  | expression and_op expression				%prec AND				{ yTRACE("expression -> expression and_op expression");}
+  | expression or_op expression				%prec OR					{ yTRACE("expression -> expression or_op expression");}
+  | expression comp expression				%prec GEQ				{ yTRACE("expression -> expression comp expression");}
   | TRUE_C																		{ yTRACE("expression -> TRUE_C");}
   | FALSE_C																		{ yTRACE("expression -> FALSE_C");}
   | '(' expression ')'														{ yTRACE("expression -> (expression)");}
@@ -157,23 +162,33 @@ variable
   | ID '[' INT_C ']'															{ yTRACE("variable -> ID[INT_C]");}
   ;
 unary_op
-  : '!'																			{ yTRACE("unary_op -> !");}
-  | '-'																			{ yTRACE("unary_op -> -");}
+  : '!'		%prec '!'														{ yTRACE("unary_op -> !");}
+  | '-'		%prec UMINUS													{ yTRACE("unary_op -> -");}
   ;
-binary_op
-  : AND																			{ yTRACE("binary_op -> AND");}
-  | OR																			{ yTRACE("binary_op -> OR");}
-  | EQ																			{ yTRACE("binary_op -> EQ");}
-  | NEQ																			{ yTRACE("binary_op -> NEQ");}
-  | LEQ																			{ yTRACE("binary_op -> LEQ");}
-  | GEQ																			{ yTRACE("binary_op -> GEQ");}
-  | '<'																			{ yTRACE("binary_op -> <");}
-  | '>'																			{ yTRACE("binary_op -> >");}
-  | '+'																			{ yTRACE("binary_op -> +");}
-  | '-'																			{ yTRACE("binary_op -> -");}
-  | '*'																			{ yTRACE("binary_op -> *");}
-  | '/'																			{ yTRACE("binary_op -> /");}
-  | '^'																			{ yTRACE("binary_op -> ^");}
+and_op
+  : AND		%prec AND														{ yTRACE("and_op -> AND");}
+  ;
+or_op
+  : OR		%prec OR															{ yTRACE("or_op -> OR");}
+  ;
+comp
+  : EQ		%prec EQ															{ yTRACE("comp -> EQ");}
+  | NEQ		%prec NEQ														{ yTRACE("comp -> NEQ");}
+  | LEQ		%prec LEQ														{ yTRACE("comp -> LEQ");}
+  | GEQ		%prec GEQ														{ yTRACE("comp -> GEQ");}
+  | '<'		%prec '<'														{ yTRACE("comp -> <");}
+  | '>'		%prec '>'														{ yTRACE("comp -> >");}
+  ;
+add_op
+  : '+'		%prec '+'														{ yTRACE("add_op -> +");}
+  | '-'		%prec '-'														{ yTRACE("add_op -> -");}
+  ;
+mult_op
+  : '*'		%prec '*'														{ yTRACE("mult_op -> *");}
+  | '/'		%prec '/'														{ yTRACE("mult_op -> /");}
+  ;
+exp_op
+  : '^'		%prec '^'														{ yTRACE("exp_op -> ^");}
   ;
 constructor
   : type '(' arguments ')'													{ yTRACE("constructor -> type (arguments)");}
