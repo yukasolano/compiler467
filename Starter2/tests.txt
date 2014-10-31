@@ -18,8 +18,9 @@ The  main function is enclosed inside a scope
 	expression -> INT_C
 	statement -> variable = expression
 	statements -> statements statement
-	scope -> '{' declarations statements '}'
+	scope -> { declarations statements }
 	program -> scope
+
 
 
 Otherwise it gets an error 
@@ -43,7 +44,7 @@ Declaration is similar to C
 	declaration -> type ID ;
 	declarations -> declarations declaration
 	statements -> Epsilon
-	scope -> '{' declarations statements '}'
+	scope -> { declarations statements }
 	program -> scope
 
 But it is not allowed to declare 2 variables in 1 declaration
@@ -144,17 +145,18 @@ WHILE statemets
 	variable -> ID
 	variable -> ID
 	expression -> variable
-	binary_op -> +
+	add_op -> +
 	expression -> INT_C
-	expression -> expression binary_op expression
+	expression -> expression add_op expression
 	statement -> variable = expression
 	statements -> statements statement
-	scope -> '{' declarations statements '}'
+	scope -> { declarations statements }
 	statement -> scope
 	statement -> while(expression) statement
 	statements -> statements statement
-	scope -> '{' declarations statements '}'
+	scope -> { declarations statements }
 	program -> scope
+
 
 
 ###########################################
@@ -166,17 +168,18 @@ IF statements
 	statements -> Epsilon
 	variable -> ID
 	expression -> variable
-	binary_op -> EQ
+	comp -> EQ
 	expression -> TRUE_C
-	expression -> expression binary_op expression
+	expression -> expression comp expression
 	variable -> ID
 	expression -> FLOAT_C
 	statement -> variable = expression
 	else_statement -> Epsilon
 	statement -> if(expression) statement else_statement
 	statements -> statements statement
-	scope -> '{' declarations statements '}'
+	scope -> { declarations statements }
 	program -> scope
+
 
 ###########################################
 
@@ -187,9 +190,9 @@ IF_ELSE statements
 	statements -> Epsilon
 	variable -> ID
 	expression -> variable
-	binary_op -> EQ
+	comp -> EQ
 	expression -> TRUE_C
-	expression -> expression binary_op expression
+	expression -> expression comp expression
 	variable -> ID
 	expression -> FLOAT_C
 	statement -> variable = expression
@@ -199,7 +202,7 @@ IF_ELSE statements
 	else_statement -> ELSE statement
 	statement -> if(expression) statement else_statement
 	statements -> statements statement
-	scope -> '{' declarations statements '}'
+	scope -> { declarations statements }
 	program -> scope
 
 
@@ -208,17 +211,17 @@ IF_ELSE statements
 	statements -> Epsilon
 	variable -> ID
 	expression -> variable
-	binary_op -> EQ
+	comp -> EQ
 	expression -> TRUE_C
-	expression -> expression binary_op expression
+	expression -> expression comp expression
 	variable -> ID
 	expression -> FLOAT_C
 	statement -> variable = expression
 	variable -> ID
 	expression -> variable
-	binary_op -> EQ
+	comp -> EQ
 	expression -> TRUE_C
-	expression -> expression binary_op expression
+	expression -> expression comp expression
 	variable -> ID
 	expression -> FLOAT_C
 	statement -> variable = expression
@@ -262,46 +265,77 @@ FUNCTIONS
 
 Precedences
 
-This statement should be a = (5 + (4 * 3))
-and there is no way to know whether it is right!
+This statement should be read as a = (5 + (4 * 3));
 
 	{ a = 5 + 4 * 3;}   
 	declarations -> Epsilon
 	statements -> Epsilon
 	variable -> ID
 	expression -> INT_C
-	binary_op -> +
+	add_op -> +
 	expression -> INT_C
-	binary_op -> *
+	mult_op -> *
 	expression -> INT_C
-	expression -> expression binary_op expression    	<<
-	expression -> expression binary_op expression		<<
+	expression -> expression mult_op expression
+	expression -> expression add_op expression
 	statement -> variable = expression
 	statements -> statements statement
-	scope -> '{' declarations statements '}'
+	scope -> { declarations statements }
 	program -> scope
 
 
-This statement should be a = ((5 ^ (-2)) + 3), 
-but it seems to be a = (5  ^ -( 2 + 3)) which is wrong!
+
+This statement should be read as a = ((5 ^ (-2)) + 3);
 
 	{a= 5 ^ -2 + 3;}
 	declarations -> Epsilon
 	statements -> Epsilon
 	variable -> ID
 	expression -> INT_C
-	binary_op -> ^
+	exp_op -> ^
 	unary_op -> -
 	expression -> INT_C
-	binary_op -> +
+	expression -> unary_op expression
+	expression -> expression exp_op expression
+	add_op -> +
 	expression -> INT_C
-	expression -> expression binary_op expression	<<
-	expression -> unary_op expression				<<
-	expression -> expression binary_op expression	<<
+	expression -> expression add_op expression
 	statement -> variable = expression
 	statements -> statements statement
 	scope -> { declarations statements }
 	program -> scope
+
+This statement should be read as while((a>=0) || ((b != c) && (!d)));
+
+	{while(a>=0 || b != c && !d);}
+	declarations -> Epsilon
+	statements -> Epsilon
+	variable -> ID
+	expression -> variable
+	comp -> GEQ
+	expression -> INT_C
+	expression -> expression comp expression
+	or_op -> OR
+	variable -> ID
+	expression -> variable
+	comp -> NEQ
+	variable -> ID
+	expression -> variable
+	expression -> expression comp expression
+	and_op -> AND
+	unary_op -> !
+	variable -> ID
+	expression -> variable
+	expression -> unary_op expression
+	expression -> expression and_op expression
+	expression -> expression or_op expression
+	statement -> ;
+	statement -> while(expression) statement
+	statements -> statements statement
+	scope -> { declarations statements }
+	program -> scope
+
+
 
 
 

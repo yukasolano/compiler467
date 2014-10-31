@@ -1,0 +1,47 @@
+
+
+Assignment 2
+
+In order to build the LR parser we basically used the given context-free grammar that generates the MiniGLSL language. We only made some modifications for the operators' precedence being respected. The binary operators were split up based on their precedence.
+
+The old rules:
+	
+	expression 	→ 	expression binary_op expression
+	binary_op	→	'&& | ′||′ | ′==′ | ′!=′ | ′<′ | ′<=′
+					'>′ | ′>=′ | ′+′ | ′−′ | ′∗′ | ′/′ | ′ˆ′
+
+The new rules:
+
+	expression 	→ 	expression add_op expression		%prec '+'			
+	expression 	→ 	expression mult_op expression		%prec '*'				
+	expression 	→ 	expression exp_op expression		%prec '^'			
+	expression 	→ 	expression and_op expression		%prec AND	
+	expression 	→ 	expression or_op expression			%prec OR		
+	expression 	→ 	expression comp expression			%prec GEQ												
+
+	and_op		→	AND		%prec AND	
+
+	or_op		→	OR		%prec OR														
+
+	comp		→	EQ		%prec EQ													
+	comp		→	NEQ		%prec NEQ														
+	comp		→	LEQ		%prec LEQ														
+	comp		→	GEQ		%prec GEQ														
+	comp		→	'<'		%prec '<'														
+	comp		→	'>'		%prec '>'														
+
+	add_op		→	'+'		%prec '+'														
+	add_op		→	'-'		%prec '-'	
+
+	mult_op		→	'*'		%prec '*'														
+	mult_op		→	'/'		%prec '/'														
+
+	exp_op		→	'^'		%prec '^'														
+			
+
+Using the old rules, this statement a = 5 ^ -2 + 3, for instance, was read as a = (5  ^ -( 2 + 3)), and after the changes it was read as a = ((5 ^ (-2)) + 3). The other precedence tests were in the tests.txt file. 
+
+It was also verified that the statements and expressions accepted by the MiniGLSL Language were also accepted by the LR parser and the cases that are syntactically wrong, such as declaring 2 variables in 1 declaration, were rejected. The semantic errors were ignored.
+
+
+
