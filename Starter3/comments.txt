@@ -1,0 +1,5 @@
+print op names
+func names (dp3 ...)
+type names vec3 ...
+
+format of the tree??

@@ -15,6 +15,8 @@
 
 // forward declare
 struct node_;
+struct Visitor;
+typedef struct Visitor Visitor;
 typedef struct node_ node;
 extern node *ast;
 
@@ -51,7 +53,11 @@ struct node_ {
   // an example of tagging each node with a type
   node_kind kind;
 
+
   union {
+
+    node *nested_scope;
+
     struct {
       node *declarations;
       node *statements;
@@ -86,7 +92,7 @@ struct node_ {
 
 
 
-    int type;
+    char *type;
 
     struct {
       node *type;
@@ -98,12 +104,12 @@ struct node_ {
     } function;
   
     struct {
-      int op;
+      char *op;
       node *right;
     } unary_expr;
 
     struct {
-      int op;
+      char *op;
       node *left;
       node *right;
     } binary_expr;
@@ -134,6 +140,15 @@ struct node_ {
     // etc.
   };
 };
+
+/*struct Visitor {
+  void ( ∗ visit_expression) ( Visitor∗ , node∗ );
+  void ( ∗ visit_statement ) ( Visitor∗ , node∗ );
+};
+*/
+
+
+
 
 node *ast_allocate(node_kind type, ...);
 void ast_free(node *ast);
