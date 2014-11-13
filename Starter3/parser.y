@@ -72,8 +72,7 @@ enum {
 %token          INT_T
 %token          BOOL_T
 %token          CONST
-%token          FALSE_C TRUE_C
-%token          FUNC
+%token <as_func> FUNC
 %token          IF ELSE
 %token          AND OR NEQ EQ LEQ GEQ
 
@@ -83,6 +82,7 @@ enum {
 %token <as_vec>   IVEC_T
 %token <as_float> FLOAT_C
 %token <as_int>   INT_C
+%token <as_int>   FALSE_C TRUE_C
 %token <as_str>   ID
 
 // operator precdence
@@ -198,7 +198,7 @@ expression
   : type '(' arguments_opt ')' %prec '('
       { yTRACE("expression -> type ( arguments_opt ) \n"); $$ = ast_allocate(CONSTRUCTOR_NODE, $1, $3); }
   | FUNC '(' arguments_opt ')' %prec '('
-      { yTRACE("expression -> FUNC ( arguments_opt ) \n"); $$ = ast_allocate(FUNCTION_NODE, $3);}
+      { yTRACE("expression -> FUNC ( arguments_opt ) \n"); $$ = ast_allocate(FUNCTION_NODE, $1, $3);}
 
   /* unary opterators */
   | '-' expression %prec UMINUS
@@ -236,9 +236,9 @@ expression
 
   /* literals */
   | TRUE_C
-      { yTRACE("expression -> TRUE_C \n"); $$ = ast_allocate(BOOL_NODE, TRUE_C); }
+      { yTRACE("expression -> TRUE_C \n"); $$ = ast_allocate(BOOL_NODE, $1); }
   | FALSE_C
-      { yTRACE("expression -> FALSE_C \n"); $$ = ast_allocate(BOOL_NODE, FALSE_C); }
+      { yTRACE("expression -> FALSE_C \n"); $$ = ast_allocate(BOOL_NODE, $1); }
   | INT_C
       { yTRACE("expression -> INT_C \n"); $$ = ast_allocate(INT_NODE, $1); }
   | FLOAT_C

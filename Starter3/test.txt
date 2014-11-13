@@ -1,1 +1,1 @@
-{a= 5+4;}
+{bvec3 myBVec = dp3(true,false,true);}

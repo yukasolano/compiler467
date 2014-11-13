@@ -100,6 +100,7 @@ struct node_ {
     } constructor;
 
     struct {
+      int name;
       node *args;  
     } function;
   
@@ -149,7 +150,7 @@ struct node_ {
 
 
 
-
+char *node_print(node *ast);
 node *ast_allocate(node_kind type, ...);
 void ast_free(node *ast);
 void ast_print(node * ast);

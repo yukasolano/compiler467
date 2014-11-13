@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <string.h>
 
 #include "ast.h"
 #include "common.h"
@@ -79,6 +78,7 @@ node *ast_allocate(node_kind kind, ...) {
     break;
 
   case FUNCTION_NODE: 
+    ast->function.name = va_arg(args, int);
     ast->function.args = va_arg(args, node *);
     break;      
 
@@ -133,7 +133,11 @@ node *ast_allocate(node_kind kind, ...) {
   return ast;
 }
 
-
+char * strTest(int a){
+  char * str = malloc(sizeof(char)*20);
+  strcpy(str, "testando");
+  return str;
+}
 
 
 void ast_free(node *ast) {
@@ -142,117 +146,134 @@ void ast_free(node *ast) {
 
 void ast_print(node * ast) {
 
-  if(ast == NULL) return;
+  printf("%s\n", node_print(ast));
+
+
+}
+
+char * node_print(node *ast){
+
+  if(ast == NULL) return "";
+  char * str = malloc(sizeof(char)*30);
 
   switch (ast->kind){
 
     case NESTED_SCOPE_NODE:
       printf("NESTED_SCOPE_NODE\n");
-      ast_print(ast->nested_scope);
-      break;
+      return node_print(ast->nested_scope);
 
     case SCOPE_NODE: 
       printf("SCOPE_NODE\n");
-      ast_print(ast->scope.declarations);
-      ast_print(ast->scope.statements);
-      break;
+      sprintf(str, "\n(SCOPE \n%s", node_print(ast->scope.declarations));
+      sprintf(str, "%s%s)", str, node_print(ast->scope.statements));
+      return str;
 
     case DECLARATIONS_NODE:
       printf("DECLARATIONS_NODE\n");
-      ast_print(ast->declarations.declarations);
-      ast_print(ast->declarations.declaration); 
-      break;
+      sprintf(str, " (DECLARATIONS %s", node_print(ast->declarations.declarations));
+      sprintf(str, "%s %s)\n" , str, node_print(ast->declarations.declaration));
+      return str;
 
     case STATEMENT_NODE:
       printf("STATEMENT_NODE\n");     
-      ast_print(ast->statement.statements);
-      ast_print(ast->statement.statement); 
-      break;   
+      sprintf(str, " (STATEMENTS %s", node_print(ast->statement.statements));
+      sprintf(str, "%s %s)\n", str, node_print(ast->statement.statement)); 
+      return str;   
 
     case DECLARATION_NODE: 
       printf("DECLARATION_NODE\n");
-      ast_print(ast->declaration.type);
-      printf("ID: %s\n", ast->declaration.id);
-      ast_print(ast->declaration.expr); 
-    break;
+      sprintf(str, "(DECLARATION %s %s" ,ast->declaration.id, node_print(ast->declaration.type));
+      sprintf(str, "%s %s)", str, node_print(ast->declaration.expr));
+      return str;
 
     case IF_STATEMENT_NODE:
       printf("IF_STATEMENT_NODE\n");
-      ast_print(ast->if_stmt.expr);
-      ast_print(ast->if_stmt.stmt1); 
-      ast_print(ast->if_stmt.stmt2);
-      break;
+      sprintf(str, "(IF %s", node_print(ast->if_stmt.expr));
+      sprintf(str, "%s %s", str, node_print(ast->if_stmt.stmt1));
+      sprintf(str, "%s %s)", str, node_print(ast->if_stmt.stmt2));  
+      return str;
 
     case ASSIGNMENT_NODE:
       printf("ASSIGMENT_NODE\n");
-      ast_print(ast->assignment.var);
-      ast_print(ast->assignment.expr); 
-    break;
+      sprintf(str, "(ASSIGN <type> %s", node_print(ast->assignment.var));
+      sprintf(str, "%s %s)", str, node_print(ast->assignment.expr));
+      return str; 
 
     case TYPE_NODE:
       printf("TYPE_NODE: %s\n", ast->type);
-      break; 
+      sprintf(str, "%s", ast->type);
+      return str;
 
     case CONSTRUCTOR_NODE:
       printf("CONSTRUCTOR_NODE\n"); 
-      ast_print(ast->constructor.type);
-      ast_print(ast->constructor.args);
-      break;
+      sprintf(str, "(CALL %s", node_print(ast->constructor.type));
+      sprintf(str, "%s %s)",str, node_print(ast->constructor.args));
+      return str;
 
     case FUNCTION_NODE: 
       printf("FUNCTION_NODE\n");
-      ast_print(ast->function.args);
-      break;      
+      char name[3];
+      if (ast->function.name == 0) strcpy(name, "dp3");
+      else if (ast->function.name == 1) strcpy(name, "lit");
+      else strcpy(name, "rsq");
+      sprintf(str, "(CALL %s %s)", name, node_print(ast->function.args));
+      return str;      
 
     case BINARY_EXPRESSION_NODE:
       printf("BINARY_EXPRESSION_NODE: %s\n", ast->binary_expr.op);
-      ast_print(ast->binary_expr.left);
-      ast_print(ast->binary_expr.right);
-      break;
+      sprintf(str, "(BINARY <type> %s %s", ast->binary_expr.op, node_print(ast->binary_expr.left));
+      sprintf(str, "%s %s)", str, node_print(ast->binary_expr.right));
+      return  str;
 
     case UNARY_EXPRESSION_NODE:
       printf("UNARY_EXPRESSION_NODE: %s\n", ast->unary_expr.op);
-      ast_print(ast->unary_expr.right);
-      break;
+      sprintf(str, "(UNARY <type> %s %s)\n", ast->unary_expr.op, node_print(ast->unary_expr.right));
+      return str; 
 
     case INT_NODE:
       printf("INT_NODE: %d\n", ast->int_val);
-      break;
+      sprintf(str, "%d", ast->int_val);;
+      return str;
 
     case BOOL_NODE:
       printf("BOOL_NODE: %d\n", ast->bool_val);
-      break;
+      if(ast->bool_val == 0){
+        printf("false\n");
+        return "false";
+      } else {
+        printf("true\n");
+        return "true";
+      }
 
     case FLOAT_NODE:
       printf("FLOAT_NODE: %f\n", ast->float_val);
-      break;
+      sprintf(str, "%f\n", ast->float_val);
+      return str;
 
     case VAR_NODE:
       printf("VAR_NODE\n");
-      ast_print(ast->variable);
-      break;
+      return node_print(ast->variable);
 
     case EXPRESSION_NODE:
       printf("EXPRESSION_NODE\n");
-      ast_print(ast->expression);
-      break; 
+      return node_print(ast->expression); 
 
     case IDENT_NODE:
+      printf("IDENT_NODE: %s\n", ast->identifier.id);
       if(ast->identifier.index){
-        printf("ID: %s[%d]\n", ast->identifier.id, ast->identifier.index);
+        sprintf(str, "(INDEX <type> %s %d)", ast->identifier.id, ast->identifier.index);
       } else {
-        printf("ID: %s\n", ast->identifier.id);
-      }   
-    break;
-
+        sprintf(str, "%s", ast->identifier.id);
+      };
+      return str;
     
     case ARGUMENTS_NODE: 
       printf("ARGUMENTS_NODE\n"); 
-      ast_print(ast->arguments.args);
-      ast_print(ast->arguments.expr);      
-      break;
+      sprintf(str, "%s", node_print(ast->arguments.args));
+      sprintf(str, "%s %s", str, node_print(ast->arguments.expr)); 
+      return str;     
 
-     default: break; 
+     default: return ""; 
   }
 
 }

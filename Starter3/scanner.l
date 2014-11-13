@@ -67,8 +67,8 @@ dp3                           { yylval.as_func = 0; yOUT(FUNC); }
 rsq                           { yylval.as_func = 2; yOUT(FUNC); }
 lit                           { yylval.as_func = 1; yOUT(FUNC); }
 
-true                          { yOUT(TRUE_C); }
-false                         { yOUT(FALSE_C); }
+true                          { yylval.as_int = 1; yOUT(TRUE_C); }
+false                         { yylval.as_int = 0; yOUT(FALSE_C); }
 
 0                             { yylval.as_int = 0; yOUT(INT_C); }                  
 [1-9][0-9]*                   { if(ParseInt()) { yOUT(INT_C); } yyterminate(); }
