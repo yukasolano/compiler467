@@ -83,13 +83,8 @@ enum {
 %token <as_str>   ID
 
 %left     OR
-<<<<<<< HEAD
 %left	    AND
 %nonassoc '=' NEQ '<' LEQ '>' GEQ EQ
-=======
-%left	  AND
-%nonassoc '=' NEQ '<' LEQ '>' GEQ
->>>>>>> f9d5acce8a0dce98213cb05c09fbbadbcb7a9d19
 %left     '+' '-'
 %left     '*' '/'
 %right    '^'
@@ -126,7 +121,7 @@ declaration
   : type ID ';'																{ yTRACE("declaration -> type ID ;");}
   | type ID '=' expression ';'											{ yTRACE("declaration -> type ID = expression ;");}
   | CONST type ID '=' expression ';'									{ yTRACE("CONST declaration -> type ID = expression ;");}
-/*  |																				{ yTRACE("declaration -> Epsilon");}*/
+/*|																				{ yTRACE("declaration -> Epsilon");}*/
   ;
 statement
   : variable '=' expression ';'											{ yTRACE("statement -> variable = expression");}

@@ -1,0 +1,5 @@
+
+(SCOPE 
+ (DECLARATIONS  (DECLARATION dsfdsf int 4))
+ (STATEMENTS  (IF true (ASSIGN <type> dsfdsf 5) (ASSIGN <type> dsfdsf 6)))
+)

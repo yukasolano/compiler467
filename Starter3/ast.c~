@@ -231,7 +231,7 @@ void ast_free(node *ast) {
   default: return;
   }
 
-  //printf("Node we are about to free:\n%s\n", node_print(ast));
+  printf("Node we are about to free:\n%s\n", node_print(ast));
 
   //finally, free the node we were passed
   free(ast);

@@ -133,7 +133,7 @@ enum {
  ***********************************************************************/
 program
   : scope 
-      { yTRACE("program -> scope\n"); ast = ast_allocate(NESTED_SCOPE_NODE,$1);} 
+      { yTRACE("program -> scope\n"); $$ = ast_allocate(NESTED_SCOPE_NODE,$1);} 
   ;
 
 scope
