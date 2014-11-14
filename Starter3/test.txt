@@ -1,1 +1,1 @@
-{bvec3 myBVec = dp3(true,false,true);}
+{bvec3 myBVec = bvec3(true,false,true);}

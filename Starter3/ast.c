@@ -64,7 +64,8 @@ node *ast_allocate(node_kind kind, ...) {
     break;
 
   case TYPE_NODE:
-    ast->type = va_arg(args, char*);
+    ast->type.name = va_arg(args, char*);
+    ast->type.size = va_arg(args, int);
     break; 
 
   case CONSTRUCTOR_NODE: 
@@ -97,7 +98,7 @@ node *ast_allocate(node_kind kind, ...) {
     break;
 
   case FLOAT_NODE:
-    ast->float_val = va_arg(args, float);
+    ast->float_val = va_arg(args, double);
     break;
 
   case VAR_NODE:
@@ -248,12 +249,12 @@ void ast_print(node * ast) {
 char * node_print(node *ast){
 
   if(ast == NULL) return "";
-  char * str = malloc(sizeof(char)*30);
+  char * str = malloc(sizeof(char)*50);
 
   switch (ast->kind){
 
     case NESTED_SCOPE_NODE:
-      //printf("NESTED_SCOPE_NODE\n");
+      printf("NESTED_SCOPE_NODE\n");
       return node_print(ast->nested_scope);
 
     case SCOPE_NODE: 
@@ -295,7 +296,12 @@ char * node_print(node *ast){
 
     case TYPE_NODE:
       //printf("TYPE_NODE: %s\n", ast->type);
-      sprintf(str, "%s", ast->type);
+      if(ast->type.size == NULL){
+        sprintf(str, "%s", ast->type.name);
+      }
+      else {
+        sprintf(str, "%s%d", ast->type.name, ast->type.size+1);
+      }
       return str;
 
     case CONSTRUCTOR_NODE:
@@ -341,7 +347,7 @@ char * node_print(node *ast){
 
     case FLOAT_NODE:
       //printf("FLOAT_NODE: %f\n", ast->float_val);
-      sprintf(str, "%f\n", ast->float_val);
+      sprintf(str, "%f", ast->float_val);
       return str;
 
     case VAR_NODE:

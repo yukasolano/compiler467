@@ -91,8 +91,11 @@ struct node_ {
     } assignment;
 
 
-
-    char *type;
+    struct{
+      char* name;
+      int size;
+    }type;
+    
 
     struct {
       node *type;
