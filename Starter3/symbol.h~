@@ -4,7 +4,6 @@
 #define SYMBOL_TABLE_SIZE 256
 
 enum {
-	NONE,
 	INT,
 	IVEC2,
 	IVEC3,

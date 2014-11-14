@@ -43,7 +43,6 @@ int add_to_table(symbol_table *table, int type, float values[4], char *name, int
 	}
 	symbol *new_entry = &(table->symbol_list[table->entries]);
 	new_entry->type = type;
-	new_entry->constant = constant;
 	(table->entries)++;
 
 	//initialize all the values that matter

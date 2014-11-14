@@ -52,6 +52,7 @@ struct node_ {
 
   // an example of tagging each node with a type
   node_kind kind;
+  int expr_type;
 
 
   union {
@@ -77,6 +78,7 @@ struct node_ {
       node *type;
       char *id;
       node *expr;
+		int constant;
     } declaration;
 
     struct {
@@ -91,8 +93,11 @@ struct node_ {
     } assignment;
 
 
-
-    char *type;
+    struct{
+      char* name;
+      int size;
+    }type;
+    
 
     struct {
       node *type;
@@ -105,12 +110,12 @@ struct node_ {
     } function;
   
     struct {
-      char op[2];
+      char *op;
       node *right;
     } unary_expr;
 
     struct {
-      char op[3];
+      char *op;
       node *left;
       node *right;
     } binary_expr;

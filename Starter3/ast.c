@@ -5,10 +5,13 @@
 #include "ast.h"
 #include "common.h"
 #include "parser.tab.h"
+#include "symbol.h"
 
 #define DEBUG_PRINT_TREE 0
 
 node *ast = NULL;
+symbol_table *top_scope = create_table(NULL);
+symbol_table *current_scope = top_scope;
 
 node *ast_allocate(node_kind kind, ...) {
   va_list args;
@@ -33,7 +36,8 @@ node *ast_allocate(node_kind kind, ...) {
 
   case SCOPE_NODE:
     ast->scope.declarations = va_arg(args, node *);
-    ast->scope.statements = va_arg(args, node *);    
+    ast->scope.statements = va_arg(args, node *);
+	 current_scope = create_table(current_scope); 
     break; 
 
   case DECLARATIONS_NODE: 
@@ -50,6 +54,14 @@ node *ast_allocate(node_kind kind, ...) {
     ast->declaration.type = va_arg(args, node *);
     ast->declaration.id = va_arg(args, char*); 
     ast->declaration.expr = va_arg(args, node *);
+	 ast->declaration.constant = va_arg(args, int);
+	 int decl_type;
+	 if (strcmp(ast->declaration.type->type.name, "int") == 0) decl_type = INT;
+	 else if (strcmp(ast->declaration.type->type.name, "ivec") == 0) decl_type = IVEC4;
+	 else if (strcmp(ast->declaration.type->type.name, "bool") == 0) decl_type = BOOLEAN;
+	 else if (strcmp(ast->declaration.type->type.name, "bvec") == 0) decl_type = BVEC4;
+	 else if (strcmp(ast->declaration.type->type.name, "float") == 0) decl_type = FLOAT;
+	 else if (strcmp(ast->declaration.type->type.name, "vec") == 0) decl_type = VEC4;
     break;
 
   case IF_STATEMENT_NODE:
@@ -91,14 +103,17 @@ node *ast_allocate(node_kind kind, ...) {
 
   case INT_NODE:
     ast->int_val = va_arg(args, int);
+    ast->expr_kind = INT;
     break;
 
   case BOOL_NODE:
     ast->bool_val = va_arg(args, int);
+	 ast->expr_kind = BOOLEAN;
     break;
 
   case FLOAT_NODE:
     ast->float_val = va_arg(args, double);
+	 ast->expr_kind = FLOAT;
     break;
 
   case VAR_NODE:
@@ -254,7 +269,7 @@ char * node_print(node *ast){
   switch (ast->kind){
 
     case NESTED_SCOPE_NODE:
-      printf("NESTED_SCOPE_NODE\n");
+      //printf("NESTED_SCOPE_NODE\n");
       return node_print(ast->nested_scope);
 
     case SCOPE_NODE: 

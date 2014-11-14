@@ -1,0 +1,5 @@
+{
+int dsfdsf = 4;
+if(true) {dsfdsf = 5; dsf = 2;} else dsfdsf = 6;
+dsfdsf = 5;
+}

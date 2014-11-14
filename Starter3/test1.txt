@@ -1,4 +1,5 @@
 {
 int dsfdsf = 4;
 if(true) dsfdsf = 5; else dsfdsf = 6;
+dsfdsf = 5;
 }
