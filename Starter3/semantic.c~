@@ -57,8 +57,6 @@ void fill_types(node *ast) {
   case TYPE_NODE:
 	 if(strcmp(ast->type.name, "int")) ast->expr_kind = INT;
 	 else if(strcmp(ast->type.name, "bool")) ast->expr_kind = BOOLEAN;
-	 else if(strcmp(ast->type.name, "float")) ast->expr_kind = FLOAT;
-	 ast->expr_kind += ast->type.size;
     break; 
 
   case CONSTRUCTOR_NODE: 
