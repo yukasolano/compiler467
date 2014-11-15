@@ -172,7 +172,7 @@ statement
   | IF '(' expression ')' statement %prec WITHOUT_ELSE
       { yTRACE("statement -> IF ( expression ) statement \n"); $$ = ast_allocate(IF_STATEMENT_NODE, $3, $5, NULL); }
   | scope 
-      { yTRACE("statement -> scope \n"); $$ = ast_allocate(NESTED_SCOPE_NODE, $1); }
+      { yTRACE("statement -> scope \n"); $$ = ast_allocate(INTERMEDIATE_NODE, $1); }
   | ';'
       { yTRACE("statement -> ; \n"); $$ = NULL; }
   ;

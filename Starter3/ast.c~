@@ -30,15 +30,15 @@ node *ast_allocate(node_kind kind, ...) {
 
   case NESTED_SCOPE_NODE:
     ast->nested_scope = va_arg(args, node *);
-    
-    //DEBUG: after delete this print!!!
-    //ast_print(ast);
+    break;
+
+  case NESTED_SCOPE_NODE:
+    ast->intermediate = va_arg(args, node *);
     break;
 
   case SCOPE_NODE:
     ast->scope.declarations = va_arg(args, node *);
     ast->scope.statements = va_arg(args, node *);
-	 //current_scope = create_table(current_scope); 
     break; 
 
   case DECLARATIONS_NODE: 
@@ -56,13 +56,6 @@ node *ast_allocate(node_kind kind, ...) {
     ast->declaration.id = va_arg(args, char*); 
     ast->declaration.expr = va_arg(args, node *);
 	 ast->declaration.constant = va_arg(args, int);
-	 /*int decl_type;
-	 if (strcmp(ast->declaration.type->type.name, "int") == 0) decl_type = INT;
-	 else if (strcmp(ast->declaration.type->type.name, "ivec") == 0) decl_type = IVEC4;
-	 else if (strcmp(ast->declaration.type->type.name, "bool") == 0) decl_type = BOOLEAN;
-	 else if (strcmp(ast->declaration.type->type.name, "bvec") == 0) decl_type = BVEC4;
-	 else if (strcmp(ast->declaration.type->type.name, "float") == 0) decl_type = FLOAT;
-	 else if (strcmp(ast->declaration.type->type.name, "vec") == 0) decl_type = VEC4;*/
     break;
 
   case IF_STATEMENT_NODE:
@@ -158,6 +151,10 @@ void ast_free(node *ast) {
   case NESTED_SCOPE_NODE:
     ast_free(ast->nested_scope);
     break;
+
+  case INTERMEDIATE_NODE:
+	 ast_free(ast->intermediate);
+	 break;
 
   case SCOPE_NODE:
     ast_free(ast->scope.declarations);
@@ -270,8 +267,11 @@ char * node_print(node *ast){
   switch (ast->kind){
 
     case NESTED_SCOPE_NODE:
-      printf("NESTED_SCOPE_NODE\n");
+      //printf("NESTED_SCOPE_NODE\n");
       return node_print(ast->nested_scope);
+
+	 case INTERMEDIATE_NODE:
+		return node_print(ast->intermediate);
 
     case SCOPE_NODE: 
       //printf("SCOPE_NODE\n");

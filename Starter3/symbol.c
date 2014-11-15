@@ -96,7 +96,13 @@ symbol_table *build_all_tables(node *ast, symbol_table *current_table) {
   case NESTED_SCOPE_NODE:
 	 //no tables exist yet
     table = build_all_tables(ast->nested_scope, NULL);
-	 print_all_levels(table);
+    break;
+
+  case INTERMEDIATE_NODE:
+	 //we are not entering a new scope, so use the passed value of current_table
+	 ast->current_table = current_table;
+ 
+    build_all_tables(ast->intermediate, ast->current_table);
     break;
 
   case SCOPE_NODE:

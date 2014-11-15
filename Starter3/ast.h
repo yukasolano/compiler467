@@ -46,7 +46,9 @@ typedef enum {
   DECLARATION_NODE      = (1 << 16),
   DECLARATIONS_NODE     = (1 << 17),
   TYPE_NODE             = (1 << 18),
-  ARGUMENTS_NODE        = (1 << 19)
+  ARGUMENTS_NODE        = (1 << 19),
+
+  INTERMEDIATE_NODE     = (1 << 20)
 } node_kind;
 
 struct node_ {
@@ -60,6 +62,8 @@ struct node_ {
   union {
 
     node *nested_scope;
+
+	 node *intermediate;
 
     struct {
       node *declarations;

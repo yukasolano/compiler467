@@ -54,11 +54,14 @@ struct node_ {
   // an example of tagging each node with a type
   node_kind kind;
   int expr_kind;
+  symbol_table *current_table;
 
 
   union {
 
     node *nested_scope;
+
+	 node *intermediate;
 
     struct {
       node *declarations;

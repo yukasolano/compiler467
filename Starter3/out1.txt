@@ -1,5 +1,3 @@
-NESTED_SCOPE_NODE
-NESTED_SCOPE_NODE
 
 (SCOPE 
  (DECLARATIONS  (DECLARATIONS  (DECLARATION dsfdsf int 4))
@@ -11,11 +9,3 @@ NESTED_SCOPE_NODE
 ) (ASSIGN <type> dsfdsf 6)))
  (ASSIGN <type> dsfdsf 5))
 )
-Name: dsfdsf, Type: 9, const: 1
-Name: dsf, Type: 9, const: 0
-Finished level!
-
-Name: dsfdsf, Type: 1, const: 0
-Name: f, Type: 5, const: 0
-Finished level!
-
