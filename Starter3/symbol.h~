@@ -3,7 +3,11 @@
 
 #define SYMBOL_TABLE_SIZE 256
 
+struct node_;
+typedef struct node_ node;
+
 enum {
+	NONE,
 	INT,
 	IVEC2,
 	IVEC3,
@@ -30,13 +34,17 @@ typedef struct symbol_ {
 typedef struct symbol_table_ {
 	symbol symbol_list[SYMBOL_TABLE_SIZE];
 	int entries;
+	//the scope above the current one
 	symbol_table_ *next_level;
+
 } symbol_table;
 
 symbol_table *create_table(symbol_table *higher_level);
+void print_table(symbol_table *table);
 symbol *search_table(symbol_table *table, char *name);
+void print_all_levels(symbol_table *table);
 symbol *search_all_levels(symbol_table *table, char *name);
-int add_to_table(symbol_table *table, int type, float values[4], char *name, int constant);
+symbol_table *build_all_tables(node *ast, symbol_table *current_table);
 void delete_table(symbol_table *table);
 
 #endif

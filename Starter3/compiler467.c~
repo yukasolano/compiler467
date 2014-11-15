@@ -89,13 +89,13 @@ int main (int argc, char *argv[]) {
   }
 
 /* Phase 3: Call the AST dumping routine if requested */
-  printf("0\n");
   if (dumpAST)
     ast_print(ast);
-  printf("1\n");
-  ast_print(ast);
 /* Phase 4: Add code to call the code generation routine */
-/* TODO: call your code generation routine here */
+
+  symbol_table *table = build_all_tables(ast, NULL);
+  print_all_levels(table);
+
   if (errorOccurred)
     fprintf(outputFile,"Failed to compile\n");
   else 
@@ -106,11 +106,7 @@ int main (int argc, char *argv[]) {
  **********************************************************************/
 
 /* Make calls to any cleanup or finalization routines here. */
-  printf("In compiler.c, about to free\n");
-  ast_print(ast);
   ast_free(ast);
-  printf("In compiler.c, just freed\n");
-  ast_print(ast);
 
   /* Clean up files if necessary */
   if (inputFile != DEFAULT_INPUT_FILE)

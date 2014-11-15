@@ -92,7 +92,10 @@ int main (int argc, char *argv[]) {
   if (dumpAST)
     ast_print(ast);
 /* Phase 4: Add code to call the code generation routine */
-/* TODO: call your code generation routine here */
+
+  symbol_table *table = build_all_tables(ast, NULL);
+  //print_all_levels(table);
+
   if (errorOccurred)
     fprintf(outputFile,"Failed to compile\n");
   else 

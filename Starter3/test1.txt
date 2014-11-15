@@ -1,5 +1,5 @@
 {
-int dsfdsf = 4;
-if(true) dsfdsf = 5; else dsfdsf = 6;
+int dsfdsf = 4; float f = 2.4;
+if(true) {const bool dsfdsf = 5; bool dsf = true;} else dsfdsf = 6;
 dsfdsf = 5;
 }

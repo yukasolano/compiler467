@@ -3,6 +3,7 @@
 #define AST_H_ 1
 
 #include <stdarg.h>
+#include "symbol.h"
 
 // Dummy node just so everything compiles, create your own node/nodes
 //
@@ -53,6 +54,7 @@ struct node_ {
   // an example of tagging each node with a type
   node_kind kind;
   int expr_kind;
+  symbol_table *current_table;
 
 
   union {
