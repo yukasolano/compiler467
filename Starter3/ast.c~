@@ -241,8 +241,6 @@ void ast_free(node *ast) {
   default: return;
   }
 
-  //printf("Node we are about to free:\n%s\n", node_print(ast));
-
   //finally, free the node we were passed
   free(ast);
   ast = NULL;
@@ -302,7 +300,7 @@ char * node_print(node *ast){
 
     case ASSIGNMENT_NODE:
       //printf("ASSIGMENT_NODE\n");
-      sprintf(str, "(ASSIGN <type> %s", node_print(ast->assignment.var));
+      sprintf(str, "(ASSIGN %s %s", var_type(ast->expr_kind), node_print(ast->assignment.var));
       sprintf(str, "%s %s)", str, node_print(ast->assignment.expr));
       return str; 
 
@@ -333,13 +331,13 @@ char * node_print(node *ast){
 
     case BINARY_EXPRESSION_NODE:
       //printf("BINARY_EXPRESSION_NODE: %s\n", ast->binary_expr.op);
-      sprintf(str, "(BINARY <type> %s %s", ast->binary_expr.op, node_print(ast->binary_expr.left));
+      sprintf(str, "(BINARY %s %s %s", ast->binary_expr.op, var_type(ast->expr_kind), node_print(ast->binary_expr.left));
       sprintf(str, "%s %s)", str, node_print(ast->binary_expr.right));
       return  str;
 
     case UNARY_EXPRESSION_NODE:
       //printf("UNARY_EXPRESSION_NODE: %s\n", ast->unary_expr.op);
-      sprintf(str, "(UNARY <type> %s %s)\n", ast->unary_expr.op, node_print(ast->unary_expr.right));
+      sprintf(str, "(UNARY %s %s %s)\n", ast->unary_expr.op, var_type(ast->expr_kind), node_print(ast->unary_expr.right));
       return str; 
 
     case INT_NODE:
@@ -373,7 +371,7 @@ char * node_print(node *ast){
     case IDENT_NODE:
       //printf("IDENT_NODE: %s\n", ast->identifier.id);
       if(ast->identifier.index){
-        sprintf(str, "(INDEX <type> %s %d)", ast->identifier.id, ast->identifier.index);
+        sprintf(str, "(INDEX %s %s %d)", ast->identifier.id, var_type(ast->expr_kind), ast->identifier.index);
       } else {
         sprintf(str, "%s", ast->identifier.id);
       };

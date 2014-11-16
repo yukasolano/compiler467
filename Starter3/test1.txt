@@ -1,5 +1,6 @@
 {
-int dsfdsf = 1; float f = 2.4;
-if(true) {const bool dsfdsf = true; int dsf = 1;} else dsfdsf = 6;
+int dsfdsf = 1; float f = 2.4; float g = 3.1; bool h = true; ivec3 vect;
+if(f == f) {const bool dsfdsf = true; int dsf = 1;} else dsfdsf = 6;
 dsfdsf = 5;
+f = 1.4;
 }
