@@ -90,6 +90,7 @@ int main (int argc, char *argv[]) {
   }
 
   symbol_table *table = build_all_tables(ast, NULL);
+  add_global_symbols(table);
   fill_types(ast);
 
 /* Phase 3: Call the AST dumping routine if requested */

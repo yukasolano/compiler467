@@ -89,13 +89,14 @@ int main (int argc, char *argv[]) {
     return 0; // parse failed
   }
 
+  symbol_table *table = build_all_tables(ast, NULL);
+  add_global_symbols();
+  fill_types(ast);
+
 /* Phase 3: Call the AST dumping routine if requested */
   if (dumpAST)
     ast_print(ast);
 /* Phase 4: Add code to call the code generation routine */
-
-  symbol_table *table = build_all_tables(ast, NULL);
-  fill_types(ast);
 
   if (errorOccurred)
     fprintf(outputFile,"Failed to compile\n");

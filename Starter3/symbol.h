@@ -83,6 +83,7 @@ symbol *search_table(symbol_table *table, char *name);
 void print_all_levels(symbol_table *table);
 symbol *search_all_levels(symbol_table *table, char *name);
 symbol_table *build_all_tables(node *ast, symbol_table *current_table);
+void add_global_symbols(symbol_table *table);
 void delete_table(symbol_table *table);
 
 #endif

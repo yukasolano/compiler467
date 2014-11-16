@@ -59,7 +59,9 @@ int add_to_table(symbol_table *table, int type, float values[4], char *name, int
 		return -1;
 	}
 	if(search_table(table, name) != NULL) {
-		printf("A variable named %s is already declared in this scope.\n", name);
+		char msg[512];
+		sprintf(msg, "A variable named %s is already declared in this scope.\n", name);
+		report_error(msg);
 		return -1;
 	}
 	symbol *new_entry = &(table->symbol_list[table->entries]);
@@ -243,6 +245,29 @@ symbol_table *build_all_tables(node *ast, symbol_table *current_table) {
   default: break;
   }
   return table;
+}
+
+//add the predefined variables
+void add_global_symbols (symbol_table *table) {
+	float values[4] = {0, 0, 0, 0};
+	add_to_table(table, VEC4, values, "gl_FragColor", 0);
+	add_to_table(table, BOOLEAN, values, "gl_FragDepth", 0);
+	add_to_table(table, VEC4, values, "gl_FragCoord", 0);
+
+	add_to_table(table, VEC4, values, "gl_TexCoord", 0);
+	add_to_table(table, VEC4, values, "gl_Color", 0);
+	add_to_table(table, VEC4, values, "gl_Secondary", 0);
+	add_to_table(table, VEC4, values, "gl_FogFragCoord", 0);
+
+	add_to_table(table, VEC4, values, "gl_Light_Half", 1);
+	add_to_table(table, VEC4, values, "gl_Light_Ambient", 1);
+	add_to_table(table, VEC4, values, "gl_Material_Shininess", 1);
+
+	add_to_table(table, VEC4, values, "env1", 1);
+	add_to_table(table, VEC4, values, "env2", 1);
+	add_to_table(table, VEC4, values, "env3", 1);
+
+	print_all_levels(table);
 }
 
 void delete_table(symbol_table *table) {

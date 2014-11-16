@@ -247,6 +247,27 @@ symbol_table *build_all_tables(node *ast, symbol_table *current_table) {
   return table;
 }
 
+//add the predefined variables
+void add_global_symbols (symbol_table *table) {
+	float values[4] = {0, 0, 0, 0};
+	add_to_table(table, VEC4, values, "gl_FragColor", 0);
+	add_to_table(table, BOOLEAN, values, "gl_FragDepth", 0);
+	add_to_table(table, VEC4, values, "gl_FragCoord", 0);
+
+	add_to_table(table, VEC4, values, "gl_TexCoord", 0);
+	add_to_table(table, VEC4, values, "gl_Color", 0);
+	add_to_table(table, VEC4, values, "gl_Secondary", 0);
+	add_to_table(table, VEC4, values, "gl_FogFragCoord", 0);
+
+	add_to_table(table, VEC4, values, "gl_Light_Half", 1);
+	add_to_table(table, VEC4, values, "gl_Light_Ambient", 1);
+	add_to_table(table, VEC4, values, "gl_Material_Shininess", 1);
+
+	add_to_table(table, VEC4, values, "env1", 1);
+	add_to_table(table, VEC4, values, "env2", 1);
+	add_to_table(table, VEC4, values, "env3", 1);
+}
+
 void delete_table(symbol_table *table) {
 	if(table != NULL) free(table);
 	table = NULL;
