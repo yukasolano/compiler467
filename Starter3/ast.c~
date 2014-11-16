@@ -56,6 +56,11 @@ node *ast_allocate(node_kind kind, ...) {
     ast->declaration.id = va_arg(args, char*); 
     ast->declaration.expr = va_arg(args, node *);
 	 ast->declaration.constant = va_arg(args, int);
+	 if(ast->declaration.constant && ast->declaration.expr == NULL) {
+		 char msg[256];
+		 sprintf(msg, "Variable %s declared const but not assigned initial value.\n", ast->declaration.id);
+		 report_error(msg);
+	 }
     break;
 
   case IF_STATEMENT_NODE:
@@ -300,7 +305,7 @@ char * node_print(node *ast){
 
     case ASSIGNMENT_NODE:
       //printf("ASSIGMENT_NODE\n");
-      sprintf(str, "(ASSIGN %s %s", var_type(ast->expr_kind), node_print(ast->assignment.var));
+      sprintf(str, "(ASSIGN %s %s", var_type(ast->assignment.var->expr_kind), node_print(ast->assignment.var));
       sprintf(str, "%s %s)", str, node_print(ast->assignment.expr));
       return str; 
 

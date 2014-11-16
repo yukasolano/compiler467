@@ -90,15 +90,17 @@ void fill_types(node *ast) {
     break;
 
   case TYPE_NODE:
-	 if(strcmp(ast->type.name, "int") == 0) ast->expr_kind = INT;
-	 else if(strcmp(ast->type.name, "bool") == 0) ast->expr_kind = BOOLEAN;
-	 else if(strcmp(ast->type.name, "float") == 0) ast->expr_kind = FLOAT;
+	 if(strcmp(ast->type.name, "int") == 0 || strcmp(ast->type.name, "ivec") == 0) ast->expr_kind = INT;
+	 else if(strcmp(ast->type.name, "bool") == 0 || strcmp(ast->type.name, "bvec") == 0) ast->expr_kind = BOOLEAN;
+	 else if(strcmp(ast->type.name, "float") == 0 || strcmp(ast->type.name, "vec") == 0) ast->expr_kind = FLOAT;
 	 if(ast->expr_kind != NULL) ast->expr_kind += ast->type.size;
     break; 
 
   case CONSTRUCTOR_NODE: 
     fill_types(ast->constructor.type);
     fill_types(ast->constructor.args);
+	 if(ast->constructor.args->expr_kind != base_type(ast->constructor.type->expr_kind)) report_error("Constructor type mismatch.\n");
+	 ast->expr_kind = ast->constructor.type->expr_kind;
     break;
 
   case FUNCTION_NODE: 
@@ -135,14 +137,13 @@ void fill_types(node *ast) {
 			else if(right_type == left_type) ast->expr_kind = right_type;
 			else report_error("Invalid operands to * operator.\n");
 		 }
-		 else if(base_type(left_type) == FLOAT) {
+		 else if(base_type(left_type) == INT) {
 			//left type is an int vector or it would have triggered the first if statement
 			if(right_type == INT) ast->expr_kind = left_type;
 			else if(right_type == left_type) ast->expr_kind = right_type;
 			else report_error("Invalid operands to * operator.\n");
 		 }
 		 else report_error("Invalid operands to * operator.\n");
-		 printf("Expression type: %s\n", var_type(ast->expr_kind));
 	 }
 	 else if(strcmp(ast->binary_expr.op, "/") == 0 || strcmp(ast->binary_expr.op, "^") == 0) {
 		 if((left_type != FLOAT && left_type != INT) || (right_type != FLOAT && right_type != INT) || right_type != left_type)
@@ -202,6 +203,7 @@ void fill_types(node *ast) {
 	 else {
 		 ast->expr_kind = symb->type;
 		 /*//check if it's a vector, in which case we need to get the base type
+		 //idk wtf i was thinking when i wrote this but it seems to not make any sense
 		 if(ast->expr_kind == BVEC2 || ast->expr_kind == BVEC3 || ast->expr_kind == BVEC4) ast->expr_kind = BOOLEAN;
 		 if(ast->expr_kind == IVEC2 || ast->expr_kind == IVEC3 || ast->expr_kind == IVEC4) ast->expr_kind = INT;
 		 if(ast->expr_kind == VEC2 || ast->expr_kind == VEC3 || ast->expr_kind == VEC4) ast->expr_kind = FLOAT;*/
@@ -212,7 +214,8 @@ void fill_types(node *ast) {
   case ARGUMENTS_NODE:  
     fill_types(ast->arguments.args);
     fill_types(ast->arguments.expr);
-	 if(ast->arguments.expr->expr_kind != ast->arguments.args->expr_kind) report_error("Arguments type mismatch\n");     
+	 if(ast->arguments.expr != NULL && ast->arguments.expr->expr_kind != ast->arguments.args->expr_kind) report_error("Arguments type mismatch.\n");
+	 ast->expr_kind = ast->arguments.args->expr_kind;
     break;
 
 
