@@ -1,11 +1,41 @@
 
 (SCOPE 
- (DECLARATIONS  (DECLARATIONS  (DECLARATION dsfdsf int 4))
+ (DECLARATIONS  (DECLARATIONS  (DECLARATION dsfdsf int 1))
  (DECLARATION f float 2.400000))
  (STATEMENTS  (STATEMENTS  (IF true 
 (SCOPE 
- (DECLARATIONS  (DECLARATIONS  (DECLARATION dsfdsf bool 5))
- (DECLARATION dsf bool true))
+ (DECLARATIONS  (DECLARATIONS  (DECLARATION dsfdsf bool true))
+ (DECLARATION dsf int 1))
 ) (ASSIGN <type> dsfdsf 6)))
  (ASSIGN <type> dsfdsf 5))
 )
+Expr Kind: 1, Node Kind: 262144
+Expr Kind: 1, Node Kind: 36
+Expr Kind: 1, Node Kind: 65536
+Expr Kind: 0, Node Kind: 131072
+Expr Kind: 5, Node Kind: 262144
+Expr Kind: 5, Node Kind: 68
+Expr Kind: 5, Node Kind: 65536
+Expr Kind: 0, Node Kind: 131072
+Expr Kind: 9, Node Kind: 132
+Expr Kind: 9, Node Kind: 262144
+Expr Kind: 9, Node Kind: 132
+Expr Kind: 9, Node Kind: 65536
+Expr Kind: 0, Node Kind: 131072
+Expr Kind: 1, Node Kind: 262144
+Expr Kind: 1, Node Kind: 36
+Expr Kind: 1, Node Kind: 65536
+Expr Kind: 0, Node Kind: 131072
+Expr Kind: 0, Node Kind: 1
+Expr Kind: 0, Node Kind: 1048576
+Expr Kind: 1, Node Kind: 260
+Expr Kind: 1, Node Kind: 36
+Expr Kind: 0, Node Kind: 16386
+Expr Kind: 0, Node Kind: 4098
+Expr Kind: 0, Node Kind: 2
+Expr Kind: 1, Node Kind: 260
+Expr Kind: 1, Node Kind: 36
+Expr Kind: 0, Node Kind: 16386
+Expr Kind: 0, Node Kind: 2
+Expr Kind: 0, Node Kind: 1
+Expr Kind: 0, Node Kind: 32770

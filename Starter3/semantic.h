@@ -3,6 +3,7 @@
 
 #include "ast.h"
 #include "symbol.h"
+#include "common.h"
 
 void fill_types(node *ast);
 

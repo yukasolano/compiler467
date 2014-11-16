@@ -59,7 +59,9 @@ int add_to_table(symbol_table *table, int type, float values[4], char *name, int
 		return -1;
 	}
 	if(search_table(table, name) != NULL) {
-		printf("A variable named %s is already declared in this scope.\n", name);
+		char msg[512];
+		sprintf(msg, "A variable named %s is already declared in this scope.\n", name);
+		report_error(msg);
 		return -1;
 	}
 	symbol *new_entry = &(table->symbol_list[table->entries]);

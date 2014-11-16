@@ -179,17 +179,17 @@ statement
 
 type
   : INT_T
-      { yTRACE("type -> INT_T \n"); $$ = ast_allocate(TYPE_NODE, "int", NULL, 1); }
+      { yTRACE("type -> INT_T \n"); $$ = ast_allocate(TYPE_NODE, "int", NULL); }
   | IVEC_T
-      { yTRACE("type -> IVEC_T \n"); $$ = ast_allocate(TYPE_NODE, "ivec", $1, yylval.as_vec); }
+      { yTRACE("type -> IVEC_T \n"); $$ = ast_allocate(TYPE_NODE, "ivec", $1); }
   | BOOL_T
-      { yTRACE("type -> BOOL_T \n"); $$ = ast_allocate(TYPE_NODE, "bool", NULL, 1); }
+      { yTRACE("type -> BOOL_T \n"); $$ = ast_allocate(TYPE_NODE, "bool", NULL); }
   | BVEC_T
-      { yTRACE("type -> BVEC_T \n"); $$ = ast_allocate(TYPE_NODE, "bvec", $1, yylval.as_vec); }
+      { yTRACE("type -> BVEC_T \n"); $$ = ast_allocate(TYPE_NODE, "bvec", $1); }
   | FLOAT_T
-      { yTRACE("type -> FLOAT_T \n"); $$ = ast_allocate(TYPE_NODE, "float", NULL, 1); }
+      { yTRACE("type -> FLOAT_T \n"); $$ = ast_allocate(TYPE_NODE, "float", NULL); }
   | VEC_T
-      { yTRACE("type -> VEC_T \n"); $$ = ast_allocate(TYPE_NODE, "vec", $1, yylval.as_vec); }
+      { yTRACE("type -> VEC_T \n"); $$ = ast_allocate(TYPE_NODE, "vec", $1); }
   ;
 
 expression
@@ -253,7 +253,7 @@ expression
 
 variable
   : ID
-      { yTRACE("variable -> ID \n"); $$ = ast_allocate(IDENT_NODE, $1, NULL);  }
+      { yTRACE("variable -> ID \n"); $$ = ast_allocate(IDENT_NODE, $1, -1);  }
   | ID '[' INT_C ']' %prec '['
       { yTRACE("variable -> ID [ INT_C ] \n"); $$ = ast_allocate(IDENT_NODE, $1, $3);  }
   ;

@@ -189,7 +189,6 @@ void ast_free(node *ast) {
     break;
 
   case TYPE_NODE:
-	 //if(ast->type != NULL) free(ast->type);
     break; 
 
   case CONSTRUCTOR_NODE: 
@@ -204,12 +203,10 @@ void ast_free(node *ast) {
   case BINARY_EXPRESSION_NODE:
     ast_free(ast->binary_expr.left);
     ast_free(ast->binary_expr.right);
-	 //if(ast->binary_expr.op != NULL) free(ast->binary_expr.op);
     break;
 
   case UNARY_EXPRESSION_NODE:
     ast_free(ast->unary_expr.right);
-	 //if(ast->unary_expr.op != NULL) free(ast->unary_expr.op);
     break; 
 
   case INT_NODE:
@@ -230,7 +227,6 @@ void ast_free(node *ast) {
     break; 
 
   case IDENT_NODE:
-    //if(ast->identifier.id != NULL) free(ast->identifier.id);
   break;
 
   
@@ -244,8 +240,6 @@ void ast_free(node *ast) {
 
   default: return;
   }
-
-  //printf("Node we are about to free:\n%s\n", node_print(ast));
 
   //finally, free the node we were passed
   free(ast);

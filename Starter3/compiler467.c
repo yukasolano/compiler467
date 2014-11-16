@@ -25,6 +25,7 @@ Yuka Kyushima
 
 /* Phases 3,4: Uncomment following includes as needed */
 #include "ast.h"
+#include "semantic.h"
 //#include "codegen.h"
 
 /***********************************************************************
@@ -94,6 +95,7 @@ int main (int argc, char *argv[]) {
 /* Phase 4: Add code to call the code generation routine */
 
   symbol_table *table = build_all_tables(ast, NULL);
+  fill_types(ast);
 
   if (errorOccurred)
     fprintf(outputFile,"Failed to compile\n");

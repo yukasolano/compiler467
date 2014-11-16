@@ -48,7 +48,7 @@ extern int dumpAST;
 extern int dumpSymbols;
 extern int dumpInstructions;
 
-inline void report_error(char *msg) {
+extern void report_error(char *msg) {
 	errorOccurred = 1;
 	fprintf(errorFile, msg);
 }
