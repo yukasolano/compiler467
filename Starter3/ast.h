@@ -21,6 +21,21 @@ typedef struct Visitor Visitor;
 typedef struct node_ node;
 extern node *ast;
 
+enum {
+  DP3,
+  LIT,
+  RSQ
+};
+
+inline char *func_name(int encoding) {
+  switch(encoding) {
+    case DP3: return "dp3";
+    case RSQ: return "rsq";
+    case LIT: return "lit";
+    default: return "";
+  }
+}
+
 typedef enum {
   UNKNOWN               = 0,
 
@@ -84,7 +99,7 @@ struct node_ {
       node *type;
       char *id;
       node *expr;
-		int constant;
+		  int constant;
     } declaration;
 
     struct {
@@ -107,12 +122,14 @@ struct node_ {
 
     struct {
       node *type;
-      node *args;  
+      node *args; 
+      int qtd_args; 
     } constructor;
 
     struct {
       int name;
-      node *args;  
+      node *args; 
+      int qtd_args; 
     } function;
   
     struct {
@@ -142,6 +159,7 @@ struct node_ {
     struct {
       node *args;
       node *expr;
+      int qtd_args;
     } arguments;
 
    
@@ -153,11 +171,6 @@ struct node_ {
   };
 };
 
-/*struct Visitor {
-  void ( ∗ visit_expression) ( Visitor∗ , node∗ );
-  void ( ∗ visit_statement ) ( Visitor∗ , node∗ );
-};
-*/
 
 
 

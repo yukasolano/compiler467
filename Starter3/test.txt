@@ -1,1 +1,5 @@
-{bvec3 myBVec = bvec3(true,false,true);}
+{vec4 aa = vec4(4.5, 3.5, 4.5, 6.7); 
+vec4 bb = vec4(4.5, 4.5, 7.8, 8.9);
+float cc; 
+gl_FragColor = bb;
+if (env1 == aa) {int a = a/4;} else {float a;};}

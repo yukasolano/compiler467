@@ -30,11 +30,7 @@ void yyerror(char* s);    /* what to do in case of error            */
 int yylex();              /* procedure for calling lexical analyzer */
 extern int yyline;        /* variable holding current line number   */
 
-enum {
-  DP3 = 0, 
-  LIT = 1, 
-  RSQ = 2
-};
+
 
 %}
 
@@ -253,7 +249,7 @@ expression
 
 variable
   : ID
-      { yTRACE("variable -> ID \n"); $$ = ast_allocate(IDENT_NODE, $1, NULL);  }
+      { yTRACE("variable -> ID \n"); $$ = ast_allocate(IDENT_NODE, $1, -1);  }
   | ID '[' INT_C ']' %prec '['
       { yTRACE("variable -> ID [ INT_C ] \n"); $$ = ast_allocate(IDENT_NODE, $1, $3);  }
   ;

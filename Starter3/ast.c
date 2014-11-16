@@ -125,7 +125,7 @@ node *ast_allocate(node_kind kind, ...) {
 
   case ARGUMENTS_NODE:  
     ast->arguments.args = va_arg(args, node *);
-    ast->arguments.expr = va_arg(args, node *);      
+    ast->arguments.expr = va_arg(args, node *);       
     break;
 
   default: break;
@@ -134,11 +134,6 @@ node *ast_allocate(node_kind kind, ...) {
   return ast;
 }
 
-char * strTest(int a){
-  char * str = malloc(sizeof(char)*20);
-  strcpy(str, "testando");
-  return str;
-}
 
 
 void ast_free(node *ast) {
@@ -322,11 +317,7 @@ char * node_print(node *ast){
 
     case FUNCTION_NODE: 
       //printf("FUNCTION_NODE\n");
-      char name[3];
-      if (ast->function.name == 0) strcpy(name, "dp3");
-      else if (ast->function.name == 1) strcpy(name, "lit");
-      else strcpy(name, "rsq");
-      sprintf(str, "(CALL %s %s)", name, node_print(ast->function.args));
+      sprintf(str, "(CALL %s %s)", func_name(ast->function.name), node_print(ast->function.args));
       return str;      
 
     case BINARY_EXPRESSION_NODE:
@@ -369,8 +360,8 @@ char * node_print(node *ast){
       return node_print(ast->expression); 
 
     case IDENT_NODE:
-      //printf("IDENT_NODE: %s\n", ast->identifier.id);
-      if(ast->identifier.index){
+      //printf("IDENT_NODE: %s %d\n", ast->identifier.id,ast->identifier.index );
+      if(ast->identifier.index != -1){
         sprintf(str, "(INDEX %s %s %d)", ast->identifier.id, var_type(ast->expr_kind), ast->identifier.index);
       } else {
         sprintf(str, "%s", ast->identifier.id);
@@ -388,18 +379,3 @@ char * node_print(node *ast){
 
 }
 
-
-  
- /* void visit ( Visitor ∗ visitor , Node ∗ root ) {
-    if (NULL == root ) return;
-    switch ( root->kind ) {
-      case STATEMENT: visitor->visit_statement (root); break;
-      case EXPRESSION : visitor->visit_expression (root); break;
-    }
-  };
-
-  void my_visit_expression ( Visitor * visitor, Node * expr);
-  void my_visit_statement ( Visitor ∗ visitor , Node ∗ statement ) {
-  //...
-  visit ( visitor , statement->next);
-}*/
