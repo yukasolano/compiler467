@@ -72,6 +72,8 @@ struct node_ {
   node_kind kind;
   int expr_kind;
   symbol_table *current_table;
+  int constant_val;
+  float values[4];
 
 
   union {

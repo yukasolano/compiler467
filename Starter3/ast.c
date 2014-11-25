@@ -22,6 +22,8 @@ node *ast_allocate(node_kind kind, ...) {
   ast->kind = kind;
   ast->expr_kind = NONE;
 
+  int i;
+
   va_start(args, kind); 
 
   switch(kind) {
@@ -56,6 +58,15 @@ node *ast_allocate(node_kind kind, ...) {
     ast->declaration.id = va_arg(args, char*); 
     ast->declaration.expr = va_arg(args, node *);
 	 ast->declaration.constant = va_arg(args, int);
+
+	 if(ast->declaration.expr != NULL) {
+	 	if(ast->declaration.expr->constant_val == 1) {
+			ast->constant_val = 1;
+			for(i = 0; i < 4; i++) {
+				ast->values[i] = ast->declaration.expr->values[i];
+			}
+		}
+	 }
     break;
 
   case IF_STATEMENT_NODE:
@@ -97,16 +108,22 @@ node *ast_allocate(node_kind kind, ...) {
 
   case INT_NODE:
     ast->int_val = va_arg(args, int);
+	 ast->values[0] = (float)ast->int_val;
+	 ast->constant_val = 1;
     ast->expr_kind = INT;
     break;
 
   case BOOL_NODE:
     ast->bool_val = va_arg(args, int);
+	 ast->values[0] = (float)ast->bool_val;
+	 ast->constant_val = 1;
 	 ast->expr_kind = BOOLEAN;
     break;
 
   case FLOAT_NODE:
     ast->float_val = va_arg(args, double);
+	 ast->values[0] = ast->float_val;
+	 ast->constant_val = 1;
 	 ast->expr_kind = FLOAT;
     break;
 
@@ -116,6 +133,10 @@ node *ast_allocate(node_kind kind, ...) {
 
   case EXPRESSION_NODE:
     ast->expression = va_arg(args, node *);
+	 if(ast->expression->constant_val == 1) {
+			ast->constant_val = 1;
+			ast->values[0] = ast->expression->values[0];
+	 }
     break; 
 
   case IDENT_NODE:
@@ -125,8 +146,7 @@ node *ast_allocate(node_kind kind, ...) {
 
   case ARGUMENTS_NODE:  
     ast->arguments.args = va_arg(args, node *);
-    ast->arguments.expr = va_arg(args, node *);       
-    break;
+    ast->arguments.expr = va_arg(args, node *);
 
   default: break;
   }

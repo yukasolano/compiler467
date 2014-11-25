@@ -1,5 +1,5 @@
 {
-int dsfdsf = 1; float f = 2.4; float g = 3.1; bool h = true;vec3 vect = vec3(1.1, 2.3, 3.4);
+int dsfdsf = 1; float f = 2.4; float g = 3.1; bool h = true;vec4 vect = vec4(1.5, 2.3, 3.4, 5.7);
 vect = f*vect;
 if(f == f) {const bool dsfdsf = true; int dsf = 1;} else dsfdsf = 6;
 dsfdsf = 5;

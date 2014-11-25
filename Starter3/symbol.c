@@ -18,6 +18,7 @@ void print_table(symbol_table *table) {
 	for(i = 0; i < table->entries; i++) {
 		symbol symb = table->symbol_list[i];
 		printf("Name: %s, Type: %d, const: %d\n", symb.name, symb.type, symb.constant);
+		printf("Value 0: %f, Value 1: %f, Value 2: %f, Value 3: %f\n", symb.value[0], symb.value[1], symb.value[2], symb.value[3]);
 	}
 	return NULL;
 }
@@ -46,6 +47,11 @@ symbol *search_all_levels(symbol_table *table, char *name) {
 	symbol_table *curr = table;
 	symbol *symb = NULL;
 	while((symb = search_table(curr, name)) == NULL) {
+		if(strcmp(name, "gl_FragColor") == 0 || strcmp(name, "gl_FragDepth") == 0 || strcmp(name, "gl_FragCoord") == 0) {
+			//these are result registers and we are in a scope other than the top level scope
+			report_error("Cannot write a result register in this scope.\n");
+			return NULL;
+		}
 		if(curr->next_level != NULL) curr = curr->next_level;
 		else return NULL;
 	}
@@ -81,8 +87,8 @@ int add_to_table(symbol_table *table, int type, float values[4], char *name, int
 		default:
 			new_entry->value[0] = values[0];
 	}
-	//printf("Added Name: %s, Type: %d, const: %d\n", new_entry->name, new_entry->type, new_entry->constant);
-	symbol *symb;
+	printf("Added Name: %s, Type: %d, const: %d\n", new_entry->name, new_entry->type, new_entry->constant);
+	printf("Value 0: %f, Value 1: %f, Value 2: %f, Value 3: %f\n", values[0], values[1], values[2], values[3]);
 	return 0;
 }
 
@@ -91,7 +97,8 @@ symbol_table *build_all_tables(node *ast, symbol_table *current_table) {
   if(ast == NULL) return;
   float values[4] = {0, 0, 0, 0};
   symbol_table *table = NULL;
-  //printf("here %d\n", (ast->kind == NESTED_SCOPE_NODE)? 1 : 0);
+  node *temp_node;
+  int i;
 
   switch(ast->kind) {
 
@@ -145,13 +152,25 @@ symbol_table *build_all_tables(node *ast, symbol_table *current_table) {
 	 else if (strcmp(ast->declaration.type->type.name, "float") == 0) decl_type = FLOAT;
 	 else if (strcmp(ast->declaration.type->type.name, "vec") == 0) decl_type = VEC2;
 
-	 if(ast->declaration.type->type.size > 0) decl_type += ast->declaration.type->type.size - 1;
-
-	 /*if(ast->declaration.expr != NULL) {
-		//get the values
-		;
-	 }*/
-	 add_to_table(current_table, decl_type, values, ast->declaration.id, ast->declaration.constant);
+	 //check if type should be a vector type
+	 if(ast->declaration.type->type.size > 0) {
+		decl_type += ast->declaration.type->type.size - 1;
+		/*if(ast->declaration.expr->kind == CONSTRUCTOR_NODE) {
+			temp_node = ast->declaration.expr->constructor.args; //pointing to top level arguments node
+		 	for(i = 0; i < ast->declaration.type->type.size + 1; i++) {
+				printf("Here: %d %d %f\n", i, temp_node->values[0], temp_node->values[0]);
+				if(temp_node->arguments.expr != NULL) {
+					ast->values[i] = temp_node->arguments.expr->values[0];
+					printf("Arguments: %f %f %f %f\n", ast->values[0], ast->values[1], ast->values[2], ast->values[3]);
+					if(temp_node->arguments.args != NULL) {
+						temp_node = temp_node->arguments.args;
+					}
+				}
+				//else break;
+			}
+		}*/
+	 }
+	 add_to_table(current_table, decl_type, ast->values, ast->declaration.id, ast->declaration.constant);
     break;
 
   case IF_STATEMENT_NODE:
