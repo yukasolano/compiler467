@@ -57,16 +57,23 @@ node *ast_allocate(node_kind kind, ...) {
     ast->declaration.type = va_arg(args, node *);
     ast->declaration.id = va_arg(args, char*); 
     ast->declaration.expr = va_arg(args, node *);
-	 ast->declaration.constant = va_arg(args, int);
+    ast->declaration.constant = va_arg(args, int);
+  
+    if(ast->declaration.expr != NULL) {
+      //Check if declaration is a scalar
+      if(ast->declaration.expr->constant_val == 1) {
+		    ast->constant_val = 1;
+        ast->values[0] = ast->declaration.expr->values[0];
+		  }
+      
+      //Check if declaration is vector (constructor)
+      if (ast->declaration.expr->kind == CONSTRUCTOR_NODE){
+        for (int i = 0; i < 4; i++){
+          ast->values[i] = ast->declaration.expr->values[i];
+        }
+      }  
+    }
 
-	 if(ast->declaration.expr != NULL) {
-	 	if(ast->declaration.expr->constant_val == 1) {
-			ast->constant_val = 1;
-			for(i = 0; i < 4; i++) {
-				ast->values[i] = ast->declaration.expr->values[i];
-			}
-		}
-	 }
     break;
 
   case IF_STATEMENT_NODE:
@@ -88,6 +95,17 @@ node *ast_allocate(node_kind kind, ...) {
   case CONSTRUCTOR_NODE: 
     ast->constructor.type = va_arg(args, node *);
     ast->constructor.args = va_arg(args, node *);
+    if (ast->constructor.args != NULL){
+      ast->constructor.qtd_args = ast->constructor.args->arguments.qtd_args;
+    }else {
+      ast->constructor.qtd_args = 0; 
+    }
+    //printf("DEBUG CONSTRUCTOR_NODE ");
+    for (int i = 0; i < ast->constructor.qtd_args; i++){
+      ast->values[i] = ast->constructor.args->values[i];
+     // printf("%f ",ast->values[i]);
+    }
+   // printf("\n");
     break;
 
   case FUNCTION_NODE: 
@@ -114,6 +132,7 @@ node *ast_allocate(node_kind kind, ...) {
     break;
 
   case BOOL_NODE:
+
     ast->bool_val = va_arg(args, int);
 	 ast->values[0] = (float)ast->bool_val;
 	 ast->constant_val = 1;
@@ -134,9 +153,16 @@ node *ast_allocate(node_kind kind, ...) {
   case EXPRESSION_NODE:
     ast->expression = va_arg(args, node *);
 	 if(ast->expression->constant_val == 1) {
+    
 			ast->constant_val = 1;
 			ast->values[0] = ast->expression->values[0];
+      //printf("EXPR_NODE => BOOL_FLOAT_INT_NODE %f\n", ast->values[0] );
 	 }
+
+   /*if (ast->expression->kind == INT_NODE || ast->expression->kind == BOOL_NODE || ast->expression->kind == FLOAT_NODE){
+    ast->values[0] = ast->expression->values[0];
+    printf("EXPR_NODE => BOOL_FLOAT_INT_NODE \n");
+   }*/ 
     break; 
 
   case IDENT_NODE:
@@ -147,6 +173,21 @@ node *ast_allocate(node_kind kind, ...) {
   case ARGUMENTS_NODE:  
     ast->arguments.args = va_arg(args, node *);
     ast->arguments.expr = va_arg(args, node *);
+
+    //The father node get the values and qtd_args of the child node
+   if(ast->arguments.args!= NULL){
+    ast->arguments.qtd_args = ast->arguments.args->arguments.qtd_args + 1;
+    if (ast->arguments.expr != NULL){
+      for(int i = 0; i < ast->arguments.qtd_args; i++){
+        ast->values[i] = ast->arguments.args->values[i];
+      }
+      ast->values[ast->arguments.qtd_args] = ast->arguments.expr->values[0];
+    } else {
+      for(int i = 0; i < ast->arguments.qtd_args; i++){
+        ast->values[i] = ast->arguments.args->values[i];
+      }
+    }   
+   } 
 
   default: break;
   }
@@ -209,6 +250,7 @@ void ast_free(node *ast) {
   case CONSTRUCTOR_NODE: 
     ast_free(ast->constructor.type);
     ast_free(ast->constructor.args);
+
     break;
 
   case FUNCTION_NODE: 

@@ -6,7 +6,6 @@
 
 
 void fill_types(node *ast) {
-
   if(ast == NULL) return;
   ast->expr_kind = NONE;
   symbol *symb = NULL;
@@ -22,15 +21,15 @@ void fill_types(node *ast) {
     break;
 
   case INTERMEDIATE_NODE:
-	 fill_types(ast->intermediate);
-	 break;
+	fill_types(ast->intermediate);
+	break;
 
   case SCOPE_NODE:
     fill_types(ast->scope.declarations);
     fill_types(ast->scope.statements);    
     break; 
 
-  case DECLARATIONS_NODE: 
+  case DECLARATIONS_NODE:
     fill_types(ast->declarations.declarations);
     fill_types(ast->declarations.declaration); 
     break;
@@ -43,7 +42,7 @@ void fill_types(node *ast) {
   case DECLARATION_NODE: 
     fill_types(ast->declaration.type);
     fill_types(ast->declaration.expr);
-	 if((ast->declaration.expr != NULL) && ast->declaration.expr->expr_kind != ast->declaration.type->expr_kind) {
+	 if(ast->declaration.expr != NULL && ast->declaration.expr->expr_kind != ast->declaration.type->expr_kind) {
 		//invalid declaration
 		char msg[512];
 		sprintf(msg, "Declaration type mismatch: variable %s declared as type %s but assigned value of type %s\n", ast->declaration.id, 				var_type(ast->declaration.type->expr_kind), var_type(ast->declaration.expr->expr_kind));
@@ -65,10 +64,9 @@ void fill_types(node *ast) {
  			}		 			
  		}	 	
 	 }
-	 else if(ast->declaration.expr != NULL && ast->declaration.expr->kind == VAR_NODE & ast->declaration.expr->variable->kind == IDENT_NODE){
+	 else if(ast->declaration.expr != NULL && ast->declaration.expr->kind == VAR_NODE && ast->declaration.expr->variable->kind == IDENT_NODE){
 	 	//result variable: cannot be read. Write-only.
 		char id[32];
-		printf("DEBUG: decl\n");
 		strncpy(id, ast->declaration.expr->variable->identifier.id, 32);
 		if(strcmp(id, "gl_FragColor") == 0 || strcmp(id,"gl_FragDepth") == 0 || strcmp(id, "gl_FragCoord") == 0){		
 			char msg[512];
@@ -76,7 +74,6 @@ void fill_types(node *ast) {
 	 		report_error(msg); 			
 		}	
 	 }
-	 
 	 ast->expr_kind = ast->declaration.type->expr_kind;
     break;
 
@@ -149,11 +146,11 @@ void fill_types(node *ast) {
     fill_types(ast->constructor.args);
 
     //Get the quantity of arguments
-    if (ast->constructor.args != NULL){
+    /*if (ast->constructor.args != NULL){
     	ast->constructor.qtd_args = ast->constructor.args->arguments.qtd_args;
     }else {
     	ast->constructor.qtd_args = 0; 
-    }
+    }*/
     
 	if(ast->constructor.args->expr_kind != base_type(ast->constructor.type->expr_kind)) report_error("Constructor type mismatch.\n");	 
 	ast->expr_kind = ast->constructor.type->expr_kind;
@@ -166,6 +163,12 @@ void fill_types(node *ast) {
 		sprintf(msg, "%s constructor should have %d arguments, but it has %d.\n", var_type(ast->expr_kind), qtd_args ,ast->constructor.qtd_args);
 		report_error(msg);
 	}
+	/*printf("DEBUG CONSTRUCTOR_NODE ");
+	for (int i = 0; i < ast->constructor.qtd_args; i++){
+		ast->values[i] = ast->constructor.args->values[i];
+		printf("%f ",ast->values[i]);
+	}
+	printf("\n");*/
     break;
 
   case FUNCTION_NODE: 
@@ -312,25 +315,25 @@ void fill_types(node *ast) {
     break; 
 
   case INT_NODE:
-	 ast->expr_kind = INT;
+	ast->expr_kind = INT;
     break;
 
   case BOOL_NODE:
-	 ast->expr_kind = BOOLEAN;
+	ast->expr_kind = BOOLEAN;
     break;
 
   case FLOAT_NODE:
-	 ast->expr_kind = FLOAT;
+	ast->expr_kind = FLOAT;
     break;
 
   case VAR_NODE:
     fill_types(ast->variable);
-	 ast->expr_kind = ast->variable->expr_kind;
+	ast->expr_kind = ast->variable->expr_kind;
     break;
 
   case EXPRESSION_NODE:
     fill_types(ast->expression);
-	 ast->expr_kind = ast->expression->expr_kind;
+	ast->expr_kind = ast->expression->expr_kind;
     break;
 
   case IDENT_NODE:
@@ -357,16 +360,26 @@ void fill_types(node *ast) {
   break;
 
   
-  case ARGUMENTS_NODE:  
+  case ARGUMENTS_NODE: 
     fill_types(ast->arguments.args);
     fill_types(ast->arguments.expr);
-	 if(ast->arguments.expr != NULL && ast->arguments.expr->expr_kind != ast->arguments.args->expr_kind) report_error("Arguments type mismatch.\n");
-	 ast->expr_kind = ast->arguments.args->expr_kind;
+	if(ast->arguments.expr != NULL && ast->arguments.expr->expr_kind != ast->arguments.args->expr_kind) report_error("Arguments type mismatch.\n");
+	ast->expr_kind = ast->arguments.args->expr_kind;
+
+	 /*//The father node get the values and qtd_args of the child node
 	 if(ast->arguments.args!= NULL){
 	 	ast->arguments.qtd_args = ast->arguments.args->arguments.qtd_args + 1;
-	 } else {
-	 	ast->arguments.qtd_args = 0; 
-	 }
+	 	if (ast->arguments.expr != NULL){
+	 		for(int i = 0; i < ast->arguments.qtd_args; i++){
+	 			ast->values[i] = ast->arguments.args->values[i];
+	 		}
+	 		ast->values[ast->arguments.qtd_args] = ast->arguments.expr->values[0];
+	 	} else {
+	 		for(int i = 0; i < ast->arguments.qtd_args; i++){
+	 			ast->values[i] = ast->arguments.args->values[i];
+	 		}
+	 	}	 	
+	 } */
     break;
 
 

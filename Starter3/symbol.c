@@ -153,8 +153,8 @@ symbol_table *build_all_tables(node *ast, symbol_table *current_table) {
 	 else if (strcmp(ast->declaration.type->type.name, "vec") == 0) decl_type = VEC2;
 
 	 //check if type should be a vector type
-	 if(ast->declaration.type->type.size > 0) {
-		decl_type += ast->declaration.type->type.size - 1;
+	 //if(ast->declaration.type->type.size > 0) {
+	//	decl_type += ast->declaration.type->type.size - 1;
 		/*if(ast->declaration.expr->kind == CONSTRUCTOR_NODE) {
 			temp_node = ast->declaration.expr->constructor.args; //pointing to top level arguments node
 		 	for(i = 0; i < ast->declaration.type->type.size + 1; i++) {
@@ -169,7 +169,7 @@ symbol_table *build_all_tables(node *ast, symbol_table *current_table) {
 				//else break;
 			}
 		}*/
-	 }
+	 //}
 	 add_to_table(current_table, decl_type, ast->values, ast->declaration.id, ast->declaration.constant);
     break;
 
