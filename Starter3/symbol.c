@@ -145,12 +145,24 @@ symbol_table *build_all_tables(node *ast, symbol_table *current_table) {
     build_all_tables(ast->declaration.type, ast->current_table);
     build_all_tables(ast->declaration.expr, ast->current_table);
 	 int decl_type;
-	 if (strcmp(ast->declaration.type->type.name, "int") == 0) decl_type = INT;
+	 /*if (strcmp(ast->declaration.type->type.name, "int") == 0) decl_type = INT;
 	 else if (strcmp(ast->declaration.type->type.name, "ivec") == 0) decl_type = IVEC2;
 	 else if (strcmp(ast->declaration.type->type.name, "bool") == 0) decl_type = BOOLEAN;
 	 else if (strcmp(ast->declaration.type->type.name, "bvec") == 0) decl_type = BVEC2;
 	 else if (strcmp(ast->declaration.type->type.name, "float") == 0) decl_type = FLOAT;
-	 else if (strcmp(ast->declaration.type->type.name, "vec") == 0) decl_type = VEC2;
+	 else if (strcmp(ast->declaration.type->type.name, "vec") == 0) decl_type = VEC2;*/
+	 if (strcmp(ast->declaration.type->type.name, "int") == 0) decl_type = INT;
+	 else if (strcmp(ast->declaration.type->type.name, "ivec") == 0 && ast->declaration.type->type.size == 1) decl_type = IVEC2;
+	 else if (strcmp(ast->declaration.type->type.name, "ivec") == 0 && ast->declaration.type->type.size == 2) decl_type = IVEC3;
+	 else if (strcmp(ast->declaration.type->type.name, "ivec") == 0 && ast->declaration.type->type.size == 3) decl_type = IVEC4;
+	 else if (strcmp(ast->declaration.type->type.name, "bool") == 0) decl_type = BOOLEAN;
+	 else if (strcmp(ast->declaration.type->type.name, "bvec") == 0 && ast->declaration.type->type.size == 1) decl_type = BVEC2;
+	 else if (strcmp(ast->declaration.type->type.name, "bvec") == 0 && ast->declaration.type->type.size == 2) decl_type = BVEC3;
+	 else if (strcmp(ast->declaration.type->type.name, "bvec") == 0 && ast->declaration.type->type.size == 3) decl_type = BVEC4;
+	 else if (strcmp(ast->declaration.type->type.name, "float") == 0) decl_type = FLOAT;
+	 else if (strcmp(ast->declaration.type->type.name, "vec") == 0 && ast->declaration.type->type.size == 1) decl_type = VEC2;
+	 else if (strcmp(ast->declaration.type->type.name, "vec") == 0 && ast->declaration.type->type.size == 2) decl_type = VEC3;
+	 else if (strcmp(ast->declaration.type->type.name, "vec") == 0 && ast->declaration.type->type.size == 3) decl_type = VEC4;
 
 	 //check if type should be a vector type
 	 //if(ast->declaration.type->type.size > 0) {

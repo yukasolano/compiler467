@@ -26,7 +26,7 @@ Yuka Kyushima
 /* Phases 3,4: Uncomment following includes as needed */
 #include "ast.h"
 #include "semantic.h"
-//#include "codegen.h"
+#include "codegen.h"
 
 /***********************************************************************
  * Default values for various files. Note assumption that default files
@@ -97,14 +97,14 @@ int main (int argc, char *argv[]) {
 /* Phase 3: Call the AST dumping routine if requested */
   if (dumpAST)
     ast_print(ast);
-  
-/* Phase 4: Add code to call the code generation routine */
 
+/* Phase 4: Add code to call the code generation routine */
+ 
   if (errorOccurred)
     fprintf(outputFile,"Failed to compile\n");
   else 
-   // genCode(ast);
-    ;
+    genCode(ast);
+    //;
 /***********************************************************************
  * Post Compilation Cleanup
  **********************************************************************/
@@ -144,7 +144,8 @@ void getOpts (int numargs, char **argstr) {
 
   /* Initialize global variables to default values */
   inputFile         = DEFAULT_INPUT_FILE;
-  outputFile        = DEFAULT_OUTPUT_FILE;
+  //outputFile        = DEFAULT_OUTPUT_FILE;
+  outputFile        = fileOpen ("frag.txt", "w", DEFAULT_OUTPUT_FILE);
   errorFile         = DEFAULT_ERROR_FILE;
   dumpFile          = DEFAULT_DUMP_FILE;
   traceFile         = DEFAULT_TRACE_FILE;

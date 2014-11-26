@@ -1,0 +1,16 @@
+#COMPILER467
+
+PARAM constLiteral = 9.000000;
+PARAM uni = program.env[1];
+TEMP noInit;
+TEMP varLiteral = 9.000000;
+TEMP varVector2 = {1.000000,2.000000};
+TEMP varVector3 = {1.000000,2.000000,3.000000};
+TEMP varVector4 = {1.000000,2.000000,3.000000,4.000000};
+TEMP uni2 = state.light[0].half;
+TEMP att2 = fragment.color;
+TEMP var1 = varLiteral;
+TEMP var2 = att2;
+TEMP index1 = varVector2.y;
+TEMP index2 = att2.x;
+TEMP index3 = state.light[0].half.w;

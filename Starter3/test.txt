@@ -1,1 +1,41 @@
-{int t = 8;}
+{
+
+/*CONST init with literal*/
+const int constLiteral = 9;
+
+/*CONST init with uniform var*/
+const vec4 uni = env1;
+
+/*CONST init with attribute var - ERROR - OK*/
+/*const vec4 att = gl_TexCoord;*/
+
+/*declaration with no init - Segmentation fault!!!!*/
+int noInit;
+
+/*init with literal*/
+float varLiteral = 9.0;
+
+/*init with constructor*/
+ivec2 varVector2 = ivec2(1,2);
+ivec3 varVector3 = ivec3(1,2,3);
+ivec4 varVector4 = ivec4(1,2,3,4);
+
+/*init with uniform var*/
+vec4 uni2 = gl_Light_Half;
+
+/*init with attribute var*/
+vec4 att2 = gl_Color;
+
+/*init with result var - ERROR - OK*/
+/*vec4 res = gl_FragColor;*/
+
+/*init with a var*/
+float var1 = varLiteral;
+vec4 var2 = att2;
+
+/*init with index*/
+int index1 = varVector2[1];
+float index2 = att2[0];
+float index3 = gl_Light_Half[3];
+
+}
