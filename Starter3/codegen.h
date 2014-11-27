@@ -22,7 +22,7 @@ enum {
  	GL_FRAGDEPTH, 
  	GL_FRAGCOORD
 };
-void readTree(node *ast);
+char *readTree(node *ast);
 int genCode ( node *ast);
 
 #endif

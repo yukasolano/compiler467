@@ -69,85 +69,56 @@ char indexMap (int index){
 	}
 }
 
-void readTree(node *ast){
+int n = 0;
+char *readTree(node *ast){
 
 	if (ast == NULL) return;
 	node *temp;
+	char * varName = malloc(sizeof(char)*40);
+	char * varNameAux = malloc(sizeof(char)*40);
 	switch(ast->kind){
 
 		case NESTED_SCOPE_NODE:
 			readTree(ast->nested_scope);
-			break;
+			return "";
 
 		case INTERMEDIATE_NODE:
 			readTree(ast->intermediate);
-			break;
+			return "";
 
 		case SCOPE_NODE:
 			readTree(ast->scope.declarations);
 			readTree(ast->scope.statements);
-			break; 
+			return "";; 
 
 		case DECLARATIONS_NODE:
 			readTree(ast->declarations.declarations);
 			readTree(ast->declarations.declaration);
-			break;
+			return "";
 
 		case STATEMENT_NODE:
 			readTree(ast->statement.statements);
 			readTree(ast->statement.statement);
-			break;
+			return "";
 
 		case DECLARATION_NODE:
-			/*TODO: cases when expr is FUNC or OPERATION*/
 
 			//Check if it is CONST
-			char instr[20];
-			if (ast->declaration.constant == 1) strcpy(instr, "PARAM");
-			else strcpy(instr, "TEMP");
+			if (ast->declaration.constant == 1) {
+				fprintf(outputFile, "PARAM %s = %s;\n", ast->declaration.id, readTree(ast->declaration.expr));
 
-			//There is no initialization
-			if(ast->declaration.expr == NULL){
-				fprintf(outputFile, "%s %s;\n", instr, ast->declaration.id);
-
-			//There is initialization
-			} else {
-				//Initialization with a variable
-				if(ast->declaration.expr->kind == VAR_NODE){
-					temp = ast->declaration.expr->variable;
-
-					//Check if it is predefined variable
-					char varName[32];
-					if (int varCode = isPredefinedVar(temp->identifier.id))
-						strcpy(varName, registerMap(varCode));
-					else strcpy(varName, temp->identifier.id);
-
-					//Check if it has index
-					if (temp->identifier.index == -1){
-						fprintf(outputFile, "%s %s = %s;\n",instr, ast->declaration.id, varName);
-					} else {
-						fprintf(outputFile, "%s %s = %s.%c;\n",instr, ast->declaration.id, varName, indexMap(temp->identifier.index));
-					}
-
-				//Initialization with literal or constructor
-				} else {
-					if (ast->declaration.type->type.size == 0){
-						fprintf(outputFile, "%s %s = %f;\n", instr, ast->declaration.id, ast->values[0]);
-					} else if (ast->declaration.type->type.size == 1){
-						fprintf(outputFile, "%s %s = {%f,%f};\n", instr, ast->declaration.id, ast->values[0],ast->values[1]);
-					} else if (ast->declaration.type->type.size == 2){
-						fprintf(outputFile, "%s %s = {%f,%f,%f};\n", instr, ast->declaration.id, ast->values[0],ast->values[1], ast->values[2]);
-					} else {
-						fprintf(outputFile, "%s %s = {%f,%f,%f,%f};\n", instr, ast->declaration.id, ast->values[0],ast->values[1],ast->values[2],ast->values[3]);
-					}
-				}
+			} else {	
+				fprintf(outputFile, "TEMP %s;\n", ast->declaration.id);
+				//There is initialization
+				if(ast->declaration.expr != NULL) {
+					fprintf(outputFile, "MOV %s,%s;\n", ast->declaration.id, readTree(ast->declaration.expr));
+				}		
 			}
-			break;
+			return "";
 
 
 
-		/*TODO: case below*/
-
+		/*TODO: IF_STATEMENT*/
 		case IF_STATEMENT_NODE:
 			printf("IF_STATEMENT_NODE\n");
 			//we are not entering a new scope, so use the passed value of current_table
@@ -155,101 +126,126 @@ void readTree(node *ast){
 			//build_all_tables(ast->if_stmt.expr, ast->current_table);
 			//build_all_tables(ast->if_stmt.stmt1, ast->current_table); 
 			//build_all_tables(ast->if_stmt.stmt2, ast->current_table);
-			break;
+			return "";
 
 		case ASSIGNMENT_NODE:
-			printf("ASSIGNMENT_NODE\n");
-			//we are not entering a new scope, so use the passed value of current_table
-			/*ast->current_table = current_table;
-			build_all_tables(ast->assignment.var, ast->current_table);
-			build_all_tables(ast->assignment.expr, ast->current_table); */
-			break;
+			fprintf(outputFile, "MOV %s,%s;\n", readTree(ast->assignment.var), readTree(ast->assignment.expr));
+			return "";
 
+		/*TODO ??? */
 		case TYPE_NODE:
 			printf("TYPE_NODE\n");
-			//we are not entering a new scope, so use the passed value of current_table
-			//ast->current_table = current_table;
-			break; 
+			return ""; 
 
 		case CONSTRUCTOR_NODE:
-			printf("CONSTRUCTOR_NODE\n");
-			//we are not entering a new scope, so use the passed value of current_table
-			/*ast->current_table = current_table;
-			build_all_tables(ast->constructor.type, ast->current_table);
-			build_all_tables(ast->constructor.args, ast->current_table);*/
-			break;
+			sprintf(varName, "{%s}",readTree(ast->constructor.args));
+			return varName;
 
+		/*TODO FUNCTION_NODE*/
 		case FUNCTION_NODE:
 			printf("FUNCTION_NODE\n");
-			/*//we are not entering a new scope, so use the passed value of current_table
-			ast->current_table = current_table;
-			build_all_tables(ast->function.args, ast->current_table);
-			break;*/
+			//char *str_args = node_print(ast->function.args);
+			//readTree()
+		    if(ast->function.name == DP3){
+		    	fprintf(outputFile, "DP3 %s,%s", "tempVar", node_print(ast->function.args));
+		    	/*if(ast->function.qtd_args != 2) report_error("DP3 function should have 2 arguments.\n");
+		    	else if (ast->function.args->expr_kind == VEC4 || ast->function.args->expr_kind == VEC3) ast->expr_kind = FLOAT;
+		    	else if (ast->function.args->expr_kind == IVEC4 || ast->function.args->expr_kind == IVEC3) ast->expr_kind = INT;
+		    	else report_error("DP3 function should have 2 arguments of type VEC4, VEC3, IVEC4 or IVEC3.\n");*/
 
+		    }/*else if (ast->function.name == LIT){
+		    	if(ast->function.qtd_args != 1 || ast->function.args->expr_kind != VEC4)
+		    	 report_error("LIT function should have only one argument of type VEC4.\n");
+		    	//LIT function is type VEC4
+		    	ast->expr_kind = VEC4;
+
+		    } else if (ast->function.name == RSQ){
+		    	if(ast->function.qtd_args != 1) report_error("RSQ function should have only one argument.\n");
+		    	else if (ast->function.args->expr_kind == FLOAT) ast->expr_kind = FLOAT;
+		    	else if (ast->function.args->expr_kind == INT) ast->expr_kind = INT;
+		    	else report_error("RSQ function should have an argument of type FLOAT or INT.\n");
+		    } else{
+		    	report_error("Function not acceptable.\n");
+		    }*/
+					/*//we are not entering a new scope, so use the passed value of current_table
+					ast->current_table = current_table;
+					build_all_tables(ast->function.args, ast->current_table);*/
+			return "";
+
+		/*TODO < > >= <= == != / ^ && ||*/ 
 		case BINARY_EXPRESSION_NODE:
 			printf("BINARY_EXPRESSION_NODE\n");
-			//we are not entering a new scope, so use the passed value of current_table
-			/*ast->current_table = current_table;
-			build_all_tables(ast->binary_expr.left, ast->current_table);
-			build_all_tables(ast->binary_expr.right, ast->current_table);*/
-			break;
+			sprintf(varName,"%s",readTree(ast->binary_expr.left));
+			sprintf(varNameAux,"%s",readTree(ast->binary_expr.right));
+			if (strcmp(ast->binary_expr.op, "+") == 0) {
+				fprintf(outputFile, "ADD %s,%s,%s;\n",varName, varName, varNameAux);
+			} else if (strcmp(ast->binary_expr.op, "-") == 0) {	
+				fprintf(outputFile, "SUB %s,%s,%s;\n",varName, varName, varNameAux);
+			} else if (strcmp(ast->binary_expr.op, "*") == 0) {	
+				fprintf(outputFile, "MUL %s,%s,%s;\n",varName, varName, varNameAux);
+			}else {
+				printf("OP %s not implemented\n", ast->binary_expr.op);
+			}
+			return varName;
 
+		/*TODO !*/
 		case UNARY_EXPRESSION_NODE:
 			printf("UNARY_EXPRESSION_NODE\n");
-			//we are not entering a new scope, so use the passed value of current_table
-			/*ast->current_table = current_table;
-			build_all_tables(ast->unary_expr.right, ast->current_table);*/
-			break;
+			sprintf(varName,"%s",readTree(ast->unary_expr.right));
+			if (strcmp(ast->unary_expr.op, "!") == 0) {
+				printf("OP ! not implemented!\n");
+			} else {	
+				fprintf(outputFile, "MOV %s,-%s\n",varName, varName);
+			}
+			
+			return varName;		
+			
 
-		case INT_NODE:
-			printf("INT_NODE\n");
-			//we are not entering a new scope, so use the passed value of current_table
-			/*ast->current_table = current_table;
-			ast->expr_kind = INT;*/
-			break;
+		case INT_NODE: ; case BOOL_NODE: ; case FLOAT_NODE:
+			sprintf(varName, "tempVar%d", n); n++;
+			fprintf(outputFile, "TEMP %s;\n", varName);
+			fprintf(outputFile, "MOV %s,%f;\n", varName,ast->values[0]);
+			return varName;
 
-		case BOOL_NODE:
-			printf("BOOL_NODE\n");
-			//we are not entering a new scope, so use the passed value of current_table
-			/*ast->current_table = current_table;
-			ast->expr_kind = BOOLEAN;*/
-			break;
-
-		case FLOAT_NODE:
-			printf("FLOAT_NODE\n");
-			//we are not entering a new scope, so use the passed value of current_table
-			/*ast->current_table = current_table;
-			ast->expr_kind = FLOAT;*/
-			break;
-
+		
 		case VAR_NODE:
-			printf("VAR_NODE\n");
-			//we are not entering a new scope, so use the passed value of current_table
-			/*ast->current_table = current_table;
-			build_all_tables(ast->variable, ast->current_table);*/
-			break;
+			sprintf(varName,"%s",readTree(ast->variable));
+			return varName;
 
 		case EXPRESSION_NODE:
-			printf("EXPRESSION_NODE\n");
-			//we are not entering a new scope, so use the passed value of current_table
-			/*ast->current_table = current_table;
-			build_all_tables(ast->expression, ast->current_table);*/
-			break; 
+			sprintf(varName,"%s",readTree(ast->expression));
+			return varName;
 
 		case IDENT_NODE:
-			printf("INT_NODE\n");
-			//we are not entering a new scope, so use the passed value of current_table
-			//ast->current_table = current_table;
-			break;
+			//Check if it is predefined variable
+			if (int varCode = isPredefinedVar(ast->identifier.id))
+				strcpy(varName, registerMap(varCode));
+			else strcpy(varName, ast->identifier.id);
+
+			//Check if it has index
+			if (ast->identifier.index > -1){
+				sprintf(varName, "%s.%c", varName, indexMap(ast->identifier.index));
+			}
+			return varName;
+
 
 		case ARGUMENTS_NODE:
-			printf("ARGUMENTS_NODE\n");
-			//we are not entering a new scope, so use the passed value of current_table
-			/*ast->current_table = current_table;  
-			build_all_tables(ast->arguments.args, ast->current_table);
-			build_all_tables(ast->arguments.expr, ast->current_table);  */    
-			break;
+			if(ast->arguments.args->constant_val == 1){
+				sprintf(varName, "%f", ast->arguments.args->values[0]);
+			} else {
+				sprintf(varName, "%s", readTree(ast->arguments.args));
+			}	
+			
+			if(ast->arguments.expr != NULL){
+				if (ast->arguments.expr->constant_val == 1){
+					sprintf(varNameAux, "%f", ast->arguments.expr->values[0]);
+				} else {
+					sprintf(varNameAux, "%s", readTree(ast->arguments.expr));
+				}
+				sprintf(varName, "%s,%s", varName, varNameAux); 
+			}   
+			return varName;
 
-		default: break;
+		default: return "";
 	}
 }

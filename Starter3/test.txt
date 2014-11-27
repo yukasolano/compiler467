@@ -9,7 +9,7 @@ const vec4 uni = env1;
 /*CONST init with attribute var - ERROR - OK*/
 /*const vec4 att = gl_TexCoord;*/
 
-/*declaration with no init - Segmentation fault!!!!*/
+/*declaration with no init*/
 int noInit;
 
 /*init with literal*/
