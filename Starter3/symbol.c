@@ -87,8 +87,8 @@ int add_to_table(symbol_table *table, int type, float values[4], char *name, int
 		default:
 			new_entry->value[0] = values[0];
 	}
-	printf("Added Name: %s, Type: %d, const: %d\n", new_entry->name, new_entry->type, new_entry->constant);
-	printf("Value 0: %f, Value 1: %f, Value 2: %f, Value 3: %f\n", values[0], values[1], values[2], values[3]);
+	//printf("Added Name: %s, Type: %d, const: %d\n", new_entry->name, new_entry->type, new_entry->constant);
+	//printf("Value 0: %f, Value 1: %f, Value 2: %f, Value 3: %f\n", values[0], values[1], values[2], values[3]);
 	return 0;
 }
 

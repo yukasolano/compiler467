@@ -25,7 +25,7 @@ int isPredefinedVar(char *id){
  	if (strcmp(id, "gl_Light_Ambient") == 0) 		return GL_LIGHT_AMBIENT;
  	if (strcmp(id, "gl_Material_Shininess") == 0) 	return GL_MATERIAL_SHININESS; 
  		
- 	//Atribute
+ 	//Attribute
  	if (strcmp(id, "gl_TexCoord") == 0) 			return GL_TEXTCOORD;
  	if (strcmp(id, "gl_Color") == 0) 				return GL_COLOR;
  	if (strcmp(id, "gl_Secondary") == 0) 			return GL_SECONDARY;
@@ -70,12 +70,26 @@ char indexMap (int index){
 }
 
 int n = 0;
+
+//turn arg list into comma delimited list
+void reformat_args(char *arg_list, char *declarations) {
+	int i;
+	char temp[1024];
+	for(i = 0; arg_list[i] != '\0'; i++) {
+		if(arg_list[i] == ' ') {
+			if(arg_list[i + 1] == '\0') arg_list[i] = '\0'; //last argument; remove trailing space
+			else arg_list[i] = ',';
+		}
+	}
+}
+
 char *readTree(node *ast){
 
 	if (ast == NULL) return;
 	node *temp;
 	char * varName = malloc(sizeof(char)*40);
 	char * varNameAux = malloc(sizeof(char)*40);
+	char arg_list[1024], arg_dec[1024];
 	switch(ast->kind){
 
 		case NESTED_SCOPE_NODE:
@@ -144,29 +158,38 @@ char *readTree(node *ast){
 		/*TODO FUNCTION_NODE*/
 		case FUNCTION_NODE:
 			printf("FUNCTION_NODE\n");
+			sprintf(arg_list, node_print(ast->function.args));
+			reformat_args(arg_list, arg_dec);
+			sprintf(varName, "tempVar%d", n++);
+			fprintf(outputFile, "TEMP %s;\n", varName);
 			//char *str_args = node_print(ast->function.args);
 			//readTree()
 		    if(ast->function.name == DP3){
-		    	fprintf(outputFile, "DP3 %s,%s", "tempVar", node_print(ast->function.args));
+		    	fprintf(outputFile, "DP3 %s,%s;\n", varName, arg_list);
+				return varName;
 		    	/*if(ast->function.qtd_args != 2) report_error("DP3 function should have 2 arguments.\n");
 		    	else if (ast->function.args->expr_kind == VEC4 || ast->function.args->expr_kind == VEC3) ast->expr_kind = FLOAT;
 		    	else if (ast->function.args->expr_kind == IVEC4 || ast->function.args->expr_kind == IVEC3) ast->expr_kind = INT;
 		    	else report_error("DP3 function should have 2 arguments of type VEC4, VEC3, IVEC4 or IVEC3.\n");*/
 
-		    }/*else if (ast->function.name == LIT){
-		    	if(ast->function.qtd_args != 1 || ast->function.args->expr_kind != VEC4)
+		    }else if (ast->function.name == LIT){
+		    	fprintf(outputFile, "LIT %s,%s;\n", varName, arg_list);
+				return varName;
+		    	/*if(ast->function.qtd_args != 1 || ast->function.args->expr_kind != VEC4)
 		    	 report_error("LIT function should have only one argument of type VEC4.\n");
 		    	//LIT function is type VEC4
-		    	ast->expr_kind = VEC4;
+		    	ast->expr_kind = VEC4;*/
 
 		    } else if (ast->function.name == RSQ){
-		    	if(ast->function.qtd_args != 1) report_error("RSQ function should have only one argument.\n");
+		    	fprintf(outputFile, "RSQ %s,%s;\n", varName, arg_list);
+				return varName;
+		    	/*if(ast->function.qtd_args != 1) report_error("RSQ function should have only one argument.\n");
 		    	else if (ast->function.args->expr_kind == FLOAT) ast->expr_kind = FLOAT;
 		    	else if (ast->function.args->expr_kind == INT) ast->expr_kind = INT;
-		    	else report_error("RSQ function should have an argument of type FLOAT or INT.\n");
+		    	else report_error("RSQ function should have an argument of type FLOAT or INT.\n");*/
 		    } else{
 		    	report_error("Function not acceptable.\n");
-		    }*/
+		    }
 					/*//we are not entering a new scope, so use the passed value of current_table
 					ast->current_table = current_table;
 					build_all_tables(ast->function.args, ast->current_table);*/

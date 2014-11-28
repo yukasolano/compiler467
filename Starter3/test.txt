@@ -38,4 +38,11 @@ int index1 = varVector2[1];
 float index2 = att2[0];
 float index3 = gl_Light_Half[3];
 
+/*assignment*/
+noInit = 5 * 4;
+
+noInit = dp3(varVector3, varVector3);
+noInit = dp3(varVector3, ivec3(1, 2, 3));
+noInit = rsq(noInit);
+
 }
