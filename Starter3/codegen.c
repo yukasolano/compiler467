@@ -71,8 +71,81 @@ char indexMap (int index){
 
 int n = 0;
 
+//look for constants in function calls and declare them
+//put declarations into declarations and put the modified argument list into arg_list
+void declare_const_vars(char arg_list[], char *declarations) {
+	int i, j = 0, last_val = 0, last_space = 1, words_seen = 0, vec_start;
+	float value;
+	char temp[1024], ret[1024], varName[40];
+	strcpy(ret, "");
+	printf("before %s\n", arg_list);
+	for(i = 0; arg_list[i] != '\0'; i++) {
+		if(arg_list[i] == '(') {
+			//start of a vector
+
+			//allocate a new variable
+			sprintf(varName, "tempVar%d", n++);
+			sprintf(temp, "TEMP %s;\nMOV %s,", varName, varName);
+			strcat(declarations, temp);
+
+			strcpy(temp, "");
+
+			//printf("found vector arglist %s\n", arg_list[i]);
+
+			words_seen = 0; vec_start = 0;
+			while(arg_list[i] != ')') {
+				if(arg_list[i] == ' ') {
+					words_seen++;
+					if(words_seen == 1) {i++; continue;} //after the word CALL
+					if(words_seen == 2) {vec_start = i; temp[0] = '{';} //after the variable type
+					else temp[i - vec_start] = ',';
+				}
+				else if(vec_start > 0) temp[i - vec_start] = arg_list[i];
+				i++;
+			}
+			//end the vector
+			temp[i - vec_start - 1] = '}'; temp[i - vec_start] = ';'; temp[i - vec_start + 1] = '\n'; temp[i - vec_start + 2] = '\0';
+			strcat(declarations, temp);
+			//printf("\ndeclarations after vec:\n%s\nret:\n%s\n", declarations, ret);
+			last_val = 1;
+
+			//add the variable name to the argument list
+			strcat(ret, varName);
+			j += strlen(varName);
+			strcpy(temp, "");
+		}
+		else if(((arg_list[i] >= '0' && arg_list[i] <= '9') || arg_list[i] == '.') && !last_val && last_space) {
+			//part of a scalar
+			strcpy(temp, "");
+			last_val = 1;
+			sscanf(arg_list + i, "%s", temp);
+			value = atof(temp);
+
+			//allocate a new variable and copy in the value
+			sprintf(varName, "tempVar%d", n++);
+			sprintf(temp, "TEMP %s;\nMOV %s,%g;\n", varName, varName, value);
+			strcat(declarations, temp);
+
+			//add the variable name to the argument list
+			strcat(ret, varName);
+			j += strlen(varName);
+			strcpy(temp, "");
+		}
+		else {
+			last_val = 0;
+			ret[j] = arg_list[i];
+			ret[j + 1] = '\0';
+			j++;
+			strcpy(temp, "");
+		}
+		if(arg_list[i] == ' ') last_space = 1;
+		else last_space = 0;
+	}
+	strcpy(arg_list, ret);
+}
+
 //turn arg list into comma delimited list
-void reformat_args(char *arg_list, char *declarations) {
+void reformat_args(char *arg_list) {
 	int i;
 	char temp[1024];
 	for(i = 0; arg_list[i] != '\0'; i++) {
@@ -159,7 +232,13 @@ char *readTree(node *ast){
 		case FUNCTION_NODE:
 			printf("FUNCTION_NODE\n");
 			sprintf(arg_list, node_print(ast->function.args));
-			reformat_args(arg_list, arg_dec);
+
+			//look for compile time constants in the variable list
+			declare_const_vars(arg_list, arg_dec);
+			fprintf(outputFile, arg_dec);
+
+			//change from space delimited arg list to comma delimited
+			reformat_args(arg_list);
 			sprintf(varName, "tempVar%d", n++);
 			fprintf(outputFile, "TEMP %s;\n", varName);
 			//char *str_args = node_print(ast->function.args);

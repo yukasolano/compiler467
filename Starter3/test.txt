@@ -43,6 +43,6 @@ noInit = 5 * 4;
 
 noInit = dp3(varVector3, varVector3);
 noInit = dp3(varVector3, ivec3(1, 2, 3));
-noInit = rsq(noInit);
+noInit = rsq(1);
 
 }
