@@ -41,8 +41,13 @@ float index3 = gl_Light_Half[3];
 /*assignment*/
 noInit = 5 * 4;
 
+/*Functions*/
 noInit = dp3(varVector3, varVector3);
 noInit = dp3(varVector3, ivec3(1, 2, 3));
 noInit = rsq(1);
+
+/*Operations*/
+noInit = 1 + 2 * 3;
+
 
 }

@@ -1,6 +1,8 @@
 #ifndef _CODEGEN_H
 #define _CODEGEN_H
 
+#include <stdarg.h>
+
 #include "ast.h"
 #include "symbol.h"
 #include "common.h"
@@ -22,7 +24,7 @@ enum {
  	GL_FRAGDEPTH, 
  	GL_FRAGCOORD
 };
-char *readTree(node *ast);
+char *readTree(node *ast, char* condition);
 int genCode ( node *ast);
 
 #endif

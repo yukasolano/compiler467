@@ -5,12 +5,15 @@
 #include "codegen.h"
 
 
+
+
 /*Return 0 in case of success
 		-1 otherwise
 */
 int genCode(node *ast){
-	fprintf(outputFile, "#COMPILER467\n\n");
-	readTree(ast);
+	fprintf(outputFile, "!!ARBfp1.0\n\n");
+	readTree(ast, NULL);
+	fprintf(outputFile, "END\n");
 	return 0;
 }
 
@@ -70,10 +73,11 @@ char indexMap (int index){
 }
 
 int n = 0;
+int c = 0;
 
 //look for constants in function calls and declare them
 //put declarations into declarations and put the modified argument list into arg_list
-void declare_const_vars(char arg_list[], char *declarations) {
+/*void declare_const_vars(char arg_list[], char *declarations) {
 	int i, j = 0, last_val = 0, last_space = 1, words_seen = 0, vec_start;
 	float value;
 	char temp[1024], ret[1024], varName[40];
@@ -154,150 +158,266 @@ void reformat_args(char *arg_list) {
 			else arg_list[i] = ',';
 		}
 	}
-}
+}*/
 
-char *readTree(node *ast){
+char *readTree(node *ast, char* condition){
+	//va_list args;
 
 	if (ast == NULL) return;
 	node *temp;
 	char * varName = malloc(sizeof(char)*40);
 	char * varNameAux = malloc(sizeof(char)*40);
+	char * varNameAux2 = malloc(sizeof(char)*40);
+	char * varNameAux3 = malloc(sizeof(char)*40);
 	char arg_list[1024], arg_dec[1024];
+
+	//va_start(args, ast); 
+
 	switch(ast->kind){
 
 		case NESTED_SCOPE_NODE:
-			readTree(ast->nested_scope);
+			readTree(ast->nested_scope, condition);
 			return "";
 
 		case INTERMEDIATE_NODE:
-			readTree(ast->intermediate);
+			readTree(ast->intermediate, condition);
 			return "";
 
 		case SCOPE_NODE:
-			readTree(ast->scope.declarations);
-			readTree(ast->scope.statements);
+			readTree(ast->scope.declarations, NULL);
+			readTree(ast->scope.statements, condition);
 			return "";; 
 
 		case DECLARATIONS_NODE:
-			readTree(ast->declarations.declarations);
-			readTree(ast->declarations.declaration);
+			readTree(ast->declarations.declarations, NULL);
+			readTree(ast->declarations.declaration, NULL);
 			return "";
 
 		case STATEMENT_NODE:
-			readTree(ast->statement.statements);
-			readTree(ast->statement.statement);
+			readTree(ast->statement.statements, condition);
+			readTree(ast->statement.statement, condition);
 			return "";
 
 		case DECLARATION_NODE:
 
 			//Check if it is CONST
 			if (ast->declaration.constant == 1) {
-				fprintf(outputFile, "PARAM %s = %s;\n", ast->declaration.id, readTree(ast->declaration.expr));
+				fprintf(outputFile, "PARAM %s = %s;\n", ast->declaration.id, readTree(ast->declaration.expr, NULL));
 
 			} else {	
 				fprintf(outputFile, "TEMP %s;\n", ast->declaration.id);
 				//There is initialization
 				if(ast->declaration.expr != NULL) {
-					fprintf(outputFile, "MOV %s,%s;\n", ast->declaration.id, readTree(ast->declaration.expr));
+					//Check if it is literal
+					if(ast->declaration.expr->kind == BOOL_NODE ||ast->declaration.expr->kind == FLOAT_NODE || 
+						ast->declaration.expr->kind == INT_NODE || ast->declaration.expr->kind == CONSTRUCTOR_NODE){
+						sprintf(varName, "%f", ast->declaration.expr->values[0]);	
+					} else {
+						sprintf(varName, "%s", readTree(ast->declaration.expr, NULL));
+					}	
+					fprintf(outputFile, "MOV %s,%s;\n", ast->declaration.id, varName);
 				}		
 			}
 			return "";
 
 
 
-		/*TODO: IF_STATEMENT*/
 		case IF_STATEMENT_NODE:
-			printf("IF_STATEMENT_NODE\n");
-			//we are not entering a new scope, so use the passed value of current_table
-			//ast->current_table = current_table;
-			//build_all_tables(ast->if_stmt.expr, ast->current_table);
-			//build_all_tables(ast->if_stmt.stmt1, ast->current_table); 
-			//build_all_tables(ast->if_stmt.stmt2, ast->current_table);
+			sprintf(varName, "cond%d", c); c++;
+			fprintf(outputFile, "TEMP %s;\n", varName);
+			sprintf(varNameAux,readTree(ast->if_stmt.expr, NULL));		//cond_current is [0,1]				
+			
+			//There is a IF inside another
+			if (condition != NULL){	
+				fprintf(outputFile, "MUL %s,%s,%s\n", varName, condition, varNameAux); 	//cond = cond_pre && cond_current
+				readTree(ast->if_stmt.stmt1, varName);
+				if (ast->if_stmt.stmt2!= NULL){
+					fprintf(outputFile, "SUB %s,%s,%s\n",varNameAux, varNameAux, "1.0");		//cond_cur = cond_cur-1 => cond_cur is [-1,0]
+					fprintf(outputFile, "CMP %s,%s,%s,%s\n", varNameAux, varNameAux, "1.0", "0.0");//cond_cur = -cond_cur => cond_cur is [1,0]
+					fprintf(outputFile, "MUL %s,%s,%s\n", varName, condition, varNameAux); 	//cond = cond_pre && -cond_cur
+					readTree(ast->if_stmt.stmt2, varName);
+				}
+
+			//This is the top IF	
+			} else {
+				fprintf(outputFile, "MOV %s,%s\n",varName, varNameAux);				
+				readTree(ast->if_stmt.stmt1, varName);
+				if (ast->if_stmt.stmt2!= NULL){
+					fprintf(outputFile, "SUB %s,%s,%s\n",varName, varName, "1.0");			//cond = cond-1 => cond is [-1,0]
+					fprintf(outputFile, "CMP %s,%s,%s,%s\n", varName, varName, "1.0", "0.0");//cond = -cond => cond is [1,0]
+					readTree(ast->if_stmt.stmt2, varName);
+				}
+			}
+			
 			return "";
 
 		case ASSIGNMENT_NODE:
-			fprintf(outputFile, "MOV %s,%s;\n", readTree(ast->assignment.var), readTree(ast->assignment.expr));
+			
+			if (condition == NULL){
+				//check if it is literal
+				if(ast->assignment.expr->kind == BOOL_NODE ||ast->assignment.expr->kind == FLOAT_NODE || 
+					ast->assignment.expr->kind == INT_NODE || ast->assignment.expr->kind == CONSTRUCTOR_NODE){
+					sprintf(varName, "%f", ast->assignment.expr->values[0]);
+				} else {
+					sprintf(varName, "%s", readTree(ast->assignment.expr, NULL));
+				}	
+				fprintf(outputFile, "MOV %s,%s;\n", readTree(ast->assignment.var, NULL), varName);
+
+			} else {
+				sprintf(varName, readTree(ast->assignment.var, NULL));
+				sprintf(varNameAux, readTree(ast->assignment.expr, NULL));
+				fprintf(outputFile, "SUB %s,%s,%s\n",condition, condition, "1.0");		//cond = cond-1 => cond is [-1,0]
+				fprintf(outputFile,"CMP %s,%s,%s,%s\n", varName, condition, varName, varNameAux);
+				fprintf(outputFile, "ADD %s,%s,%s\n",condition, condition, "1.0");		//cond = cond+1 => cond is [0,1]
+			}
 			return "";
 
-		/*TODO ??? */
 		case TYPE_NODE:
-			printf("TYPE_NODE\n");
 			return ""; 
 
 		case CONSTRUCTOR_NODE:
-			sprintf(varName, "{%s}",readTree(ast->constructor.args));
+			sprintf(varName, "{%s}",readTree(ast->constructor.args, NULL));
 			return varName;
 
-		/*TODO FUNCTION_NODE*/
 		case FUNCTION_NODE:
-			printf("FUNCTION_NODE\n");
-			sprintf(arg_list, node_print(ast->function.args));
-
+			//sprintf(arg_list, node_print(ast->function.args));
+			
 			//look for compile time constants in the variable list
-			declare_const_vars(arg_list, arg_dec);
-			fprintf(outputFile, arg_dec);
+			//declare_const_vars(arg_list, arg_dec);
+			//fprintf(outputFile, arg_dec);
 
 			//change from space delimited arg list to comma delimited
-			reformat_args(arg_list);
-			sprintf(varName, "tempVar%d", n++);
-			fprintf(outputFile, "TEMP %s;\n", varName);
+			//reformat_args(arg_list);
+			//sprintf(varName, "tempVar%d", n++);
+			//fprintf(outputFile, "TEMP %s;\n", varName);
 			//char *str_args = node_print(ast->function.args);
 			//readTree()
+
+			//Create a tempVar to store the result of the function
+			sprintf(varName, "tempVar%d", n); n++;
+			fprintf(outputFile, "TEMP %s;\n", varName);
+			sprintf(varNameAux,readTree(ast->function.args, NULL));
+			
 		    if(ast->function.name == DP3){
-		    	fprintf(outputFile, "DP3 %s,%s;\n", varName, arg_list);
-				return varName;
-		    	/*if(ast->function.qtd_args != 2) report_error("DP3 function should have 2 arguments.\n");
-		    	else if (ast->function.args->expr_kind == VEC4 || ast->function.args->expr_kind == VEC3) ast->expr_kind = FLOAT;
-		    	else if (ast->function.args->expr_kind == IVEC4 || ast->function.args->expr_kind == IVEC3) ast->expr_kind = INT;
-		    	else report_error("DP3 function should have 2 arguments of type VEC4, VEC3, IVEC4 or IVEC3.\n");*/
+		    	//fprintf(outputFile, "DP3 %s,%s;\n", varName, arg_list);
+		    	fprintf(outputFile, "DP3 %s,%s;\n", varName, varNameAux);
+				//return varName;
 
 		    }else if (ast->function.name == LIT){
-		    	fprintf(outputFile, "LIT %s,%s;\n", varName, arg_list);
-				return varName;
-		    	/*if(ast->function.qtd_args != 1 || ast->function.args->expr_kind != VEC4)
-		    	 report_error("LIT function should have only one argument of type VEC4.\n");
-		    	//LIT function is type VEC4
-		    	ast->expr_kind = VEC4;*/
+		    	//fprintf(outputFile, "LIT %s,%s;\n", varName, arg_list);
+		    	fprintf(outputFile, "LIT %s,%s;\n", varName, varNameAux);
+				//return varName;
 
 		    } else if (ast->function.name == RSQ){
-		    	fprintf(outputFile, "RSQ %s,%s;\n", varName, arg_list);
-				return varName;
-		    	/*if(ast->function.qtd_args != 1) report_error("RSQ function should have only one argument.\n");
-		    	else if (ast->function.args->expr_kind == FLOAT) ast->expr_kind = FLOAT;
-		    	else if (ast->function.args->expr_kind == INT) ast->expr_kind = INT;
-		    	else report_error("RSQ function should have an argument of type FLOAT or INT.\n");*/
+		    	//fprintf(outputFile, "RSQ %s,%s;\n", varName, arg_list);
+		    	fprintf(outputFile, "RSQ %s,%s;\n", varName, varNameAux);
+				//return varName;
+		    	
 		    } else{
 		    	report_error("Function not acceptable.\n");
 		    }
-					/*//we are not entering a new scope, so use the passed value of current_table
-					ast->current_table = current_table;
-					build_all_tables(ast->function.args, ast->current_table);*/
-			return "";
+			return varName;
 
-		/*TODO < > >= <= == != / ^ && ||*/ 
+		/*TODO  /  */ 
 		case BINARY_EXPRESSION_NODE:
-			printf("BINARY_EXPRESSION_NODE\n");
-			sprintf(varName,"%s",readTree(ast->binary_expr.left));
-			sprintf(varNameAux,"%s",readTree(ast->binary_expr.right));
+			/*//Left op
+			if(ast->binary_expr.left->constant_val == 1){
+				sprintf(varNameAux, "%f", ast->binary_expr.left->values[0]);
+				sprintf(varName, "tempVar%d", n); n++;
+			} else {
+				sprintf(varNameAux, readTree(ast->binary_expr.left));
+				sprintf(varName, varNameAux);
+			}
+			//Right op
+			if(ast->binary_expr.left->constant_val == 1){
+				sprintf(varNameAux2, "%f", ast->binary_expr.right->values[0]);
+			} else {
+				sprintf(varNameAux2, "%s", readTree(ast->binary_expr.right));
+			}
+*/
+			sprintf(varNameAux,"%s",readTree(ast->binary_expr.left, NULL));
+			sprintf(varNameAux2,"%s",readTree(ast->binary_expr.right, NULL));
+			if(strncmp(varNameAux, "tempVar", 7) == 0) {
+				sprintf(varName, varNameAux);
+			} else{
+				sprintf(varName, "tempVar%d", n); n++;
+				fprintf(outputFile, "TEMP %s;\n", varName);	
+			}
+			
 			if (strcmp(ast->binary_expr.op, "+") == 0) {
-				fprintf(outputFile, "ADD %s,%s,%s;\n",varName, varName, varNameAux);
+				fprintf(outputFile, "ADD %s,%s,%s;\n",varName, varNameAux, varNameAux2);
 			} else if (strcmp(ast->binary_expr.op, "-") == 0) {	
-				fprintf(outputFile, "SUB %s,%s,%s;\n",varName, varName, varNameAux);
+				fprintf(outputFile, "SUB %s,%s,%s;\n",varName, varNameAux, varNameAux2);
 			} else if (strcmp(ast->binary_expr.op, "*") == 0) {	
-				fprintf(outputFile, "MUL %s,%s,%s;\n",varName, varName, varNameAux);
+				fprintf(outputFile, "MUL %s,%s,%s;\n",varName, varNameAux, varNameAux2);
+			} else if (strcmp(ast->binary_expr.op, "/") == 0) {	
+				//fprintf(outputFile, "MUL %s,%s,%s;\n",varName, varName, varNameAux);
+				printf("OP / not implemented\n");
+			} else if (strcmp(ast->binary_expr.op, "^") == 0) {	
+				fprintf(outputFile, "POW %s,%s,%s;\n",varName, varNameAux, varNameAux2);
+
+			//result.x = (tmp0.x < tmp1.x) ? 1.0 : 0.0;
+			} else if (strcmp(ast->binary_expr.op, "<") == 0) {	
+				fprintf(outputFile, "SLT %s,%s,%s;\n",varName, varNameAux, varNameAux2);
+
+			//result.x = (tmp0.x >= tmp1.x) ? 1.0 : 0.0;	
+			} else if (strcmp(ast->binary_expr.op, ">=") == 0) {	
+				fprintf(outputFile, "SGE %s,%s,%s;\n",varName, varNameAux, varNameAux2);
+
+			//result.x = (tmp0.x > tmp1.x) ? 1.0 : 0.0;
+			} else if (strcmp(ast->binary_expr.op, ">") == 0) {	
+				fprintf(outputFile, "SLT %s,%s,%s;\n",varName, varNameAux2, varNameAux);
+
+			//result.x = (tmp0.x <= tmp1.x) ? 1.0 : 0.0;
+			} else if (strcmp(ast->binary_expr.op, "<=") == 0) {	
+				fprintf(outputFile, "SGE %s,%s,%s;\n",varName, varNameAux2, varNameAux);
+
+			//result.x = (tmp0.x == tmp1.x) ? 1.0 : 0.0;
+			} else if (strcmp(ast->binary_expr.op, "==") == 0) {
+				sprintf(varNameAux2, "tempVar%d", n); n++;	
+				fprintf(outputFile, "TEMP %s;\n", varNameAux2);
+				fprintf(outputFile, "SGE %s,%s,%s;\n",varName, varNameAux, varNameAux2); 	//A >= B => X = 1
+				fprintf(outputFile, "SGE %s,%s,%s;\n",varNameAux, varNameAux2, varNameAux);	//A <= B => A = 1
+				fprintf(outputFile, "ADD %s,%s,%s;\n",varName, varName, varNameAux);		//A = X + A (1+1) 
+				fprintf(outputFile, "SGE %s,%s,%s;\n",varName, varName, "2.0");				//X >= 2 => X = 1
+
+			//result.x = (tmp0.x != tmp1.x) ? 1.0 : 0.0;
+			} else if (strcmp(ast->binary_expr.op, "!=") == 0) {
+				sprintf(varNameAux2, "tempVar%d", n); n++;
+				fprintf(outputFile, "TEMP %s;\n", varNameAux2);	
+				fprintf(outputFile, "SLT %s,%s,%s;\n",varName, varNameAux, varNameAux2); 	//A < B => X = 1
+				fprintf(outputFile, "SLT %s,%s,%s;\n",varNameAux, varNameAux2, varNameAux); //A > B => A = 1
+				fprintf(outputFile, "ADD %s,%s,%s;\n",varName, varName, varNameAux);		//X = X + A (1+1) 
+				fprintf(outputFile, "SGE %s,%s,%s;\n",varName, varName, "2.0");				//X >= 2 => X = 1
+
+			//result.x = (tmp0.x && tmp1.x) ? 1.0 : 0.0;
+			} else if (strcmp(ast->binary_expr.op, "&&") == 0) {
+				fprintf(outputFile, "MUL %s,%s,%s;\n",varName, varNameAux, varNameAux2); 
+
+			//result.x = (tmp0.x || tmp1.x) ? 1.0 : 0.0;
+			} else if (strcmp(ast->binary_expr.op, "||") == 0) {	
+				fprintf(outputFile, "ADD %s,%s,%s;\n",varName, varNameAux, varNameAux2); 	//X = A + B	
+				fprintf(outputFile, "SGE %s,%s,%s;\n",varName, varName, "1.0");				//X >= 1 => X = 1	
+
 			}else {
 				printf("OP %s not implemented\n", ast->binary_expr.op);
 			}
 			return varName;
 
-		/*TODO !*/
 		case UNARY_EXPRESSION_NODE:
-			printf("UNARY_EXPRESSION_NODE\n");
-			sprintf(varName,"%s",readTree(ast->unary_expr.right));
-			if (strcmp(ast->unary_expr.op, "!") == 0) {
-				printf("OP ! not implemented!\n");
+
+			sprintf(varNameAux,"%s",readTree(ast->unary_expr.right, NULL));
+			if(strncmp(varNameAux, "tempVar",7) == 0) {
+				sprintf(varName, varNameAux);
+			} else{
+				sprintf(varName, "tempVar%d", n); n++;
+				fprintf(outputFile, "TEMP %s;\n", varName);	
+			}
+			if (strcmp(ast->unary_expr.op, "!") == 0) {									//var is [0,1]
+				fprintf(outputFile, "SUB %s,%s,%s\n",varNameAux, varNameAux, "1.0"); 	//var is [-1,0]
+				fprintf(outputFile, "CMP %s,%s,%s,%s\n",varName, varNameAux, "1.0", "0.0");//var is [1,0]
 			} else {	
-				fprintf(outputFile, "MOV %s,-%s\n",varName, varName);
+				fprintf(outputFile, "MOV %s,-%s\n",varName, varNameAux);
 			}
 			
 			return varName;		
@@ -311,11 +431,11 @@ char *readTree(node *ast){
 
 		
 		case VAR_NODE:
-			sprintf(varName,"%s",readTree(ast->variable));
+			sprintf(varName,readTree(ast->variable, NULL));
 			return varName;
 
 		case EXPRESSION_NODE:
-			sprintf(varName,"%s",readTree(ast->expression));
+			sprintf(varName,readTree(ast->expression, NULL));
 			return varName;
 
 		case IDENT_NODE:
@@ -335,14 +455,14 @@ char *readTree(node *ast){
 			if(ast->arguments.args->constant_val == 1){
 				sprintf(varName, "%f", ast->arguments.args->values[0]);
 			} else {
-				sprintf(varName, "%s", readTree(ast->arguments.args));
+				sprintf(varName, "%s", readTree(ast->arguments.args, NULL));
 			}	
 			
 			if(ast->arguments.expr != NULL){
 				if (ast->arguments.expr->constant_val == 1){
 					sprintf(varNameAux, "%f", ast->arguments.expr->values[0]);
 				} else {
-					sprintf(varNameAux, "%s", readTree(ast->arguments.expr));
+					sprintf(varNameAux, "%s", readTree(ast->arguments.expr, NULL));
 				}
 				sprintf(varName, "%s,%s", varName, varNameAux); 
 			}   
