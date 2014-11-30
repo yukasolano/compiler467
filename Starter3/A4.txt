@@ -1,0 +1,129 @@
+Jared Eisen - 998212483
+Yuka Kyushima Solano - 1001009231
+
+
+
+Assignment 4
+
+
+
+The method genCode is in the codegen.h/c file and it generates the ARB code and writes it in the outputFile.
+In the codegen.h/c file has another method readTree that is called by codegen and traverses the AST and writes in the outputFile the correspond instructions depending on the current node.
+
+The procedures executed for each node are below.
+
+Note: 
+	All the values of variables are stored in the symbol table as a vector of 4 float elements. The boolean type is stored as 1.0 if it is true and 0.0 if it is false.
+
+INT_NODE, BOOL_NODE, FLOAT_NODE
+	Create a tempVar* and write the instructions: 
+		TEMP tempVar*;
+		MOV tempVar*, value[0];
+
+Note: 
+	The readTree method returns a string varName that corresponds to the variable name created in the child node. For instance, if we have "a = b + c" the ASSIGNMENT_NODE will have a EXPRESSION_NODE child, so if we call the readTree for this EXPRESSION_NODE it will return the variable name that was used to stored the result of "b + c". Suppose that this variable name is tempVar4, then the ASSIGNMENT_NODE will write the following code in the outputFile:
+	MOV a, tempVar4;
+
+IDENT_NODE
+	First, if this identifier is a predefined variable the varName will be the correspondent register name of it. Otherwise it will be the own identifier. 
+	Second, if it has an index the varName will be update to varName.index where index is x,y,z or w.
+	Last, it will return the varName.
+
+ARGUMENTS_NODE
+	It traverses all the ARGUMENTS_NODE and return a string arg0,arg1,..., argn. 
+
+CONSTRUCTOR_NODE
+	It returns a string {args} where args is a string that its child ARGUMENTS_NODE has returned.
+
+FUNCTION_NODE
+	If function is DP3 writes in the outputFile: 
+		DP3 tempVar*,arg0,arg1;
+	and it returns the variable used to stored the result of the function, tempVar*. Similar to the others functions.
+
+UNARY_EXPRESSION_NODE
+	In case operation is ! it writes:
+		MOV varName, -rightExprName;
+	In case opearion is - it writes:
+		SUB varName,rightExprName,1.0;
+		CMP varName,rightExprName,1.0,0.0;
+	And returns the varName.
+
+BINARY_EXPRESSION_NODE
+	In case operation is +,-,*,^,<,>,>=,<= uses the correspondent instructions: ADD,SUB,MUL,POW,SLT,SGE.
+	In case operation is == it writes: (A == B	iff A >= B and A <= B) 
+		TEMP tempVar*, tempVarAux;
+		SGE tempVar*,rigthExprName,leftExprName;
+		SGE tempVarAux, leftExprName,rightExprName;
+		ADD tempVar*,tempVar*,tempVarAux;
+		SGE tempVar*,tempVar*,2.0; 
+	In case operation is != it writes: (A != B	 iff A < B or A > B)
+		TEMP tempVar*, tempVarAux;
+		SLT tempVar*,rigthExprName,leftExprName;
+		SLT tempVarAux, leftExprName,rightExprName;
+		ADD tempVar*,tempVar*,tempVarAux;
+		SGE tempVar*,tempVar*,1.0; 
+	In case operation is && it uses the instruction MUL.
+	In case operation is || it uses instruction ADD and SGE to limit the result to 1.0.  
+	And returns the tempVar*.	
+
+Note: 
+	When there is a constant declaration the parameter declaration.constant will be set to 1.
+
+DECLARATION_NODE
+	First, if it is a constant declaration it writes:
+		PARAM id = values;
+	Second, if the declaration has not initialization, it writes:
+		TEMP id;
+	Third, if the declaration initializes an attribute variable, it writes:
+		ATTRIB id = attrVariableName;
+	Last, if the declaration has initialization, it writes:
+		TEMP id;
+		MOV id, values;
+			
+
+Note: 
+	To implement the IF_ELSE statements we created a new parameter in the readTree function. So for every new IF it passes a "condition" to the statements inside it.
+
+Note:  
+	The instruction CMP result, tmp0, tmp1, tmp2;
+	is equivalent to result.x = (tmp0.x < 0.0) ? tmp1.x : tmp2.x; 
+	so, as the bool is 0.0 or 1.0, we need to change it to -1.0 or 0.0 in order to the CMP works as we want.
+
+IF_STATEMENT_NODE
+	First, in case this is the top IF, (i.e. this IF is not inside another IF) it will have no previous conditions and it writes:
+		TEMP cond0;
+		MOV cond0, ifExprName;
+	and calls the readTree for the first statement and sends cond0 as a paramaters.	
+
+	When it is inside the ASSIGNMENT_NODE it will add to the outputFile the following commands:
+		SUB cond0, cond0, 1.0;
+		CMP id,cond0,id,exprName;
+		ADD cond0, cond0,1.0;
+
+	When it goes back to the IF_NODE we check if it has ELSE statement and in case positive we invert the condition by writing:
+		SUB cond0,cond0,1.0;
+		CMP cond0,cond0,1.0,0.0;
+	and do the same thing as above.
+
+	Second, if this IF is inside another, we create a new condition that will be cond = previous_cond && current_cond: 
+		TEMP cond*;
+		MUL cond*, pre_cond, cur_cond;
+	(The pre_cond is the parameter condition and the cur_cond is the ifExprName)
+	and call again the readTree with this condition.
+
+	For the ELSE the cond will be cond = previous_cond && not current_cond:
+		SUB cur_cond,cur_cond,1.0;
+		CMP cur_cond,cur_cond,1.0,0.0;
+		MUL cond*, pre_cond, cur_cond;
+	
+ASSIGNMENT_NODE
+	First, if there is no condition (i.e. the parameter condition is NULL) it writes:
+		MOV id,exprName;
+	Second, if there is condition it can only assign the value if condition is true. So it writes:
+		SUB cond0, cond0, 1.0;
+		CMP id,cond0,id,exprName;
+		ADD cond0, cond0,1.0;
+	
+
+
+Tests executed are in the files test.txt, test1.txt and test2.txt. The Demos were also tested and worked as expected.

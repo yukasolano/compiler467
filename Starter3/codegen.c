@@ -407,7 +407,7 @@ char *readTree(node *ast, char* condition){
 				fprintf(outputFile, "SLT %s,%s,%s;\n",varName, varNameAux, varNameAux2); 	//A < B => X = 1
 				fprintf(outputFile, "SLT %s,%s,%s;\n",varNameAux, varNameAux2, varNameAux); //A > B => A = 1
 				fprintf(outputFile, "ADD %s,%s,%s;\n",varName, varName, varNameAux);		//X = X + A (1+1) 
-				fprintf(outputFile, "SGE %s,%s,%s;\n",varName, varName, "2.0");				//X >= 2 => X = 1
+				fprintf(outputFile, "SGE %s,%s,%s;\n",varName, varName, "1.0");				//X >= 2 => X = 1
 
 			//result.x = (tmp0.x && tmp1.x) ? 1.0 : 0.0;
 			} else if (strcmp(ast->binary_expr.op, "&&") == 0) {
