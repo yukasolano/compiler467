@@ -50,7 +50,7 @@ char *registerMap(int varCode){
 		case GL_LIGHT_HALF: 			return "state.light[0].half";
 		case GL_LIGHT_AMBIENT: 			return "state.lightmodel.ambient";
 		case GL_MATERIAL_SHININESS: 	return "state.material.shininess";
-		case GL_TEXTCOORD: 				return "fragment.textcoord";
+		case GL_TEXTCOORD: 				return "fragment.texcoord";
 		case GL_COLOR: 					return "fragment.color";
 		case GL_SECONDARY: 				return "fragment.color.secondary";
 		case GL_FOGFRAGCOORD:			return "fragment.fogcoord";
@@ -203,19 +203,38 @@ char *readTree(node *ast, char* condition){
 			//Check if it is CONST
 			if (ast->declaration.constant == 1) {
 				fprintf(outputFile, "PARAM %s = %s;\n", ast->declaration.id, readTree(ast->declaration.expr, NULL));
-
+	
 			} else {	
-				fprintf(outputFile, "TEMP %s;\n", ast->declaration.id);
+				
 				//There is initialization
 				if(ast->declaration.expr != NULL) {
-					//Check if it is literal
-					if(ast->declaration.expr->kind == BOOL_NODE ||ast->declaration.expr->kind == FLOAT_NODE || 
-						ast->declaration.expr->kind == INT_NODE || ast->declaration.expr->kind == CONSTRUCTOR_NODE){
-						sprintf(varName, "%f", ast->declaration.expr->values[0]);	
-					} else {
-						sprintf(varName, "%s", readTree(ast->declaration.expr, NULL));
-					}	
-					fprintf(outputFile, "MOV %s,%s;\n", ast->declaration.id, varName);
+
+					//Check if the variable initialize with an attributte variable
+					int isAttrib = 0;
+					if(ast->declaration.expr->kind == VAR_NODE && ast->declaration.expr->variable->kind == IDENT_NODE){
+						temp = ast->declaration.expr->variable;
+						int varCode = isPredefinedVar(temp->identifier.id);
+						if(varCode == GL_TEXTCOORD || varCode == GL_COLOR || varCode == GL_SECONDARY || varCode == GL_FOGFRAGCOORD){
+							fprintf(outputFile, "ATTRIB %s = %s;\n", ast->declaration.id, registerMap(varCode));
+							isAttrib = 1;
+						}
+					} 
+						
+					if(!isAttrib){
+
+						fprintf(outputFile, "TEMP %s;\n", ast->declaration.id);
+						//Check if it is literal
+						if(ast->declaration.expr->kind == BOOL_NODE ||ast->declaration.expr->kind == FLOAT_NODE || 
+							ast->declaration.expr->kind == INT_NODE || ast->declaration.expr->kind == CONSTRUCTOR_NODE){
+							sprintf(varName, "%f", ast->declaration.expr->values[0]);	
+						} else {
+							sprintf(varName, "%s", readTree(ast->declaration.expr, NULL));
+						}	
+						fprintf(outputFile, "MOV %s,%s;\n", ast->declaration.id, varName);
+					}
+						
+				} else {
+					fprintf(outputFile, "TEMP %s;\n", ast->declaration.id);
 				}		
 			}
 			return "";
@@ -229,22 +248,22 @@ char *readTree(node *ast, char* condition){
 			
 			//There is a IF inside another
 			if (condition != NULL){	
-				fprintf(outputFile, "MUL %s,%s,%s\n", varName, condition, varNameAux); 	//cond = cond_pre && cond_current
+				fprintf(outputFile, "MUL %s,%s,%s;\n", varName, condition, varNameAux); 	//cond = cond_pre && cond_current
 				readTree(ast->if_stmt.stmt1, varName);
 				if (ast->if_stmt.stmt2!= NULL){
-					fprintf(outputFile, "SUB %s,%s,%s\n",varNameAux, varNameAux, "1.0");		//cond_cur = cond_cur-1 => cond_cur is [-1,0]
-					fprintf(outputFile, "CMP %s,%s,%s,%s\n", varNameAux, varNameAux, "1.0", "0.0");//cond_cur = -cond_cur => cond_cur is [1,0]
-					fprintf(outputFile, "MUL %s,%s,%s\n", varName, condition, varNameAux); 	//cond = cond_pre && -cond_cur
+					fprintf(outputFile, "SUB %s,%s,%s;\n",varNameAux, varNameAux, "1.0");		//cond_cur = cond_cur-1 => cond_cur is [-1,0]
+					fprintf(outputFile, "CMP %s,%s,%s,%s;\n", varNameAux, varNameAux, "1.0", "0.0");//cond_cur = -cond_cur => cond_cur is [1,0]
+					fprintf(outputFile, "MUL %s,%s,%s;\n", varName, condition, varNameAux); 	//cond = cond_pre && -cond_cur
 					readTree(ast->if_stmt.stmt2, varName);
 				}
 
 			//This is the top IF	
 			} else {
-				fprintf(outputFile, "MOV %s,%s\n",varName, varNameAux);				
+				fprintf(outputFile, "MOV %s,%s;\n",varName, varNameAux);				
 				readTree(ast->if_stmt.stmt1, varName);
 				if (ast->if_stmt.stmt2!= NULL){
-					fprintf(outputFile, "SUB %s,%s,%s\n",varName, varName, "1.0");			//cond = cond-1 => cond is [-1,0]
-					fprintf(outputFile, "CMP %s,%s,%s,%s\n", varName, varName, "1.0", "0.0");//cond = -cond => cond is [1,0]
+					fprintf(outputFile, "SUB %s,%s,%s;\n",varName, varName, "1.0");			//cond = cond-1 => cond is [-1,0]
+					fprintf(outputFile, "CMP %s,%s,%s,%s;\n", varName, varName, "1.0", "0.0");//cond = -cond => cond is [1,0]
 					readTree(ast->if_stmt.stmt2, varName);
 				}
 			}
@@ -266,9 +285,9 @@ char *readTree(node *ast, char* condition){
 			} else {
 				sprintf(varName, readTree(ast->assignment.var, NULL));
 				sprintf(varNameAux, readTree(ast->assignment.expr, NULL));
-				fprintf(outputFile, "SUB %s,%s,%s\n",condition, condition, "1.0");		//cond = cond-1 => cond is [-1,0]
-				fprintf(outputFile,"CMP %s,%s,%s,%s\n", varName, condition, varName, varNameAux);
-				fprintf(outputFile, "ADD %s,%s,%s\n",condition, condition, "1.0");		//cond = cond+1 => cond is [0,1]
+				fprintf(outputFile, "SUB %s,%s,%s;\n",condition, condition, "1.0");		//cond = cond-1 => cond is [-1,0]
+				fprintf(outputFile,"CMP %s,%s,%s,%s;\n", varName, condition, varName, varNameAux);
+				fprintf(outputFile, "ADD %s,%s,%s;\n",condition, condition, "1.0");		//cond = cond+1 => cond is [0,1]
 			}
 			return "";
 
@@ -414,10 +433,10 @@ char *readTree(node *ast, char* condition){
 				fprintf(outputFile, "TEMP %s;\n", varName);	
 			}
 			if (strcmp(ast->unary_expr.op, "!") == 0) {									//var is [0,1]
-				fprintf(outputFile, "SUB %s,%s,%s\n",varNameAux, varNameAux, "1.0"); 	//var is [-1,0]
-				fprintf(outputFile, "CMP %s,%s,%s,%s\n",varName, varNameAux, "1.0", "0.0");//var is [1,0]
+				fprintf(outputFile, "SUB %s,%s,%s;\n",varNameAux, varNameAux, "1.0"); 	//var is [-1,0]
+				fprintf(outputFile, "CMP %s,%s,%s,%s;\n",varName, varNameAux, "1.0", "0.0");//var is [1,0]
 			} else {	
-				fprintf(outputFile, "MOV %s,-%s\n",varName, varNameAux);
+				fprintf(outputFile, "MOV %s,-%s;\n",varName, varNameAux);
 			}
 			
 			return varName;		

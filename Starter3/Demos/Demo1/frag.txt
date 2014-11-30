@@ -1,0 +1,33 @@
+!!ARBfp1.0
+
+TEMP temp;
+TEMP cond0;
+TEMP tempVar0;
+MOV tempVar0,1.000000;
+MOV cond0,tempVar0;
+TEMP tempVar1;
+MUL tempVar1,fragment.color.x,fragment.position.x;
+SUB cond0,cond0,1.0;
+CMP temp.x,cond0,temp.x,tempVar1;
+ADD cond0,cond0,1.0;
+TEMP tempVar2;
+MUL tempVar2,fragment.color.y,fragment.position.y;
+SUB cond0,cond0,1.0;
+CMP temp.y,cond0,temp.y,tempVar2;
+ADD cond0,cond0,1.0;
+SUB cond0,cond0,1.0;
+CMP temp.z,cond0,temp.z,fragment.color.z;
+ADD cond0,cond0,1.0;
+TEMP tempVar3;
+MUL tempVar3,fragment.color.w,fragment.position.x;
+MUL tempVar3,tempVar3,fragment.position.y;
+SUB cond0,cond0,1.0;
+CMP temp.w,cond0,temp.w,tempVar3;
+ADD cond0,cond0,1.0;
+SUB cond0,cond0,1.0;
+CMP cond0,cond0,1.0,0.0;
+SUB cond0,cond0,1.0;
+CMP temp,cond0,temp,fragment.color;
+ADD cond0,cond0,1.0;
+MOV result.color,temp;
+END

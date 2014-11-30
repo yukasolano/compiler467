@@ -1,0 +1,45 @@
+!!ARBfp1.0
+
+ATTRIB fCol = fragment.color;
+ATTRIB fTex = fragment.texcoord;
+TEMP eyeNorm;
+TEMP coeff;
+TEMP shade;
+PARAM lVec = program.env[1];
+PARAM lHalf = state.light[0].half;
+PARAM red = {1.000000,0.000000,0.000000,1.000000};
+MOV eyeNorm,fTex;
+TEMP tempVar0;
+DP3 tempVar0,eyeNorm,eyeNorm;
+MOV eyeNorm.w,tempVar0;
+TEMP tempVar1;
+RSQ tempVar1,eyeNorm.w;
+MOV eyeNorm.w,tempVar1;
+TEMP tempVar2;
+MUL tempVar2,eyeNorm,eyeNorm.w;
+MOV eyeNorm,tempVar2;
+TEMP tempVar3;
+MUL tempVar3,state.lightmodel.ambient,fCol;
+MOV shade,tempVar3;
+TEMP tempVar4;
+DP3 tempVar4,lVec,eyeNorm;
+MOV coeff.x,tempVar4;
+TEMP tempVar5;
+DP3 tempVar5,lHalf,eyeNorm;
+MOV coeff.y,tempVar5;
+MOV coeff.w,state.material.shininess.x;
+TEMP tempVar6;
+LIT tempVar6,coeff;
+MOV coeff,tempVar6;
+TEMP tempVar7;
+MUL tempVar7,coeff.y,fCol;
+TEMP tempVar8;
+ADD tempVar8,shade,tempVar7;
+MOV shade,tempVar8;
+TEMP tempVar9;
+MUL tempVar9,coeff.z,fCol;
+TEMP tempVar10;
+ADD tempVar10,shade,tempVar9;
+MOV shade,tempVar10;
+MOV result.color,shade;
+END

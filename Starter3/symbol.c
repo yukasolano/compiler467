@@ -47,11 +47,11 @@ symbol *search_all_levels(symbol_table *table, char *name) {
 	symbol_table *curr = table;
 	symbol *symb = NULL;
 	while((symb = search_table(curr, name)) == NULL) {
-		if(strcmp(name, "gl_FragColor") == 0 || strcmp(name, "gl_FragDepth") == 0 || strcmp(name, "gl_FragCoord") == 0) {
+		/*if(strcmp(name, "gl_FragColor") == 0 || strcmp(name, "gl_FragDepth") == 0 || strcmp(name, "gl_FragCoord") == 0) {
 			//these are result registers and we are in a scope other than the top level scope
 			report_error("Cannot write a result register in this scope.\n");
 			return NULL;
-		}
+		}*/
 		if(curr->next_level != NULL) curr = curr->next_level;
 		else return NULL;
 	}
