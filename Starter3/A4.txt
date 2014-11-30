@@ -50,16 +50,19 @@ UNARY_EXPRESSION_NODE
 
 BINARY_EXPRESSION_NODE
 	In case operation is +,-,*,^,<,>,>=,<= uses the correspondent instructions: ADD,SUB,MUL,POW,SLT,SGE.
+	In case operation is / it writes:
+		RCP righExprName,rightExprName; 
+		MUL tempVar*,leftExprName,rightExprName;
 	In case operation is == it writes: (A == B	iff A >= B and A <= B) 
 		TEMP tempVar*, tempVarAux;
-		SGE tempVar*,rigthExprName,leftExprName;
-		SGE tempVarAux, leftExprName,rightExprName;
+		SGE tempVar*,leftExprName,rightExprName;
+		SGE tempVarAux, rightExprName,leftExprName;
 		ADD tempVar*,tempVar*,tempVarAux;
 		SGE tempVar*,tempVar*,2.0; 
 	In case operation is != it writes: (A != B	 iff A < B or A > B)
 		TEMP tempVar*, tempVarAux;
-		SLT tempVar*,rigthExprName,leftExprName;
-		SLT tempVarAux, leftExprName,rightExprName;
+		SLT tempVar*,leftExprName,rightExprName;
+		SLT tempVarAux, rightExprName,leftExprName;
 		ADD tempVar*,tempVar*,tempVarAux;
 		SGE tempVar*,tempVar*,1.0; 
 	In case operation is && it uses the instruction MUL.

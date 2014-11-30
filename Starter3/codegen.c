@@ -369,9 +369,9 @@ char *readTree(node *ast, char* condition){
 				fprintf(outputFile, "SUB %s,%s,%s;\n",varName, varNameAux, varNameAux2);
 			} else if (strcmp(ast->binary_expr.op, "*") == 0) {	
 				fprintf(outputFile, "MUL %s,%s,%s;\n",varName, varNameAux, varNameAux2);
-			} else if (strcmp(ast->binary_expr.op, "/") == 0) {	
-				//fprintf(outputFile, "MUL %s,%s,%s;\n",varName, varName, varNameAux);
-				printf("OP / not implemented\n");
+			} else if (strcmp(ast->binary_expr.op, "/") == 0) {
+				fprintf(outputFile, "RCP %s,%s;\n",varNameAux2, varNameAux2);	
+				fprintf(outputFile, "MUL %s,%s,%s;\n",varName, varNameAux, varNameAux2);
 			} else if (strcmp(ast->binary_expr.op, "^") == 0) {	
 				fprintf(outputFile, "POW %s,%s,%s;\n",varName, varNameAux, varNameAux2);
 
